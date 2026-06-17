@@ -41,7 +41,10 @@ body{font-family:'Inter',sans-serif;background:#0D1B2A;min-height:100vh;color:#E
 .match-top{display:flex;align-items:center;padding:10px 12px;gap:8px}
 .team-block{flex:1}.team-block.right{text-align:right}
 .team-name{font-size:13px;font-weight:500;line-height:1.3}
-.team-flag{font-size:18px}
+.team-flag{font-size:24px}
+.finished-section{margin-bottom:8px}
+.finished-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#162032;border:1px solid #1E3A5C;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:#9BB3CC;transition:all 0.15s;margin-bottom:4px}
+.finished-header:hover{border-color:#2E5A8C;color:#E8EDF2}
 .vs-block{text-align:center;min-width:72px}
 .match-time{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#E8EDF2;letter-spacing:1px}
 .match-meta{font-size:10px;color:#6B8AA8;margin-top:1px}
@@ -398,9 +401,36 @@ function getMatchStatus(m){
   return{label:'Открыт',cls:'status-open'};
 }
 
-function renderMatches(){
+function buildMatchCard(m){
+  const f=fmtMSK(m.ts);
+  const st=getMatchStatus(m);
+  const preds=allPredictions[m.id]||[];
+  const myPred=currentUser?preds.find(p=>p.username===currentUser.username):null;
+  const result=allResults[m.id];
+  let bottom='';
+  if(!isOpen(m)||isFinished(m)){
+    const tags=preds.map(p=>{
+      const pts=result?calcPoints(p.home_score,p.away_score,result.home_score,result.away_score):null;
+      return `<span class="pred-tag">${p.username}: ${p.home_score}-${p.away_score}${pts!==null?` <span class="pts">(+${pts})</span>`:''}</span>`;
+    }).join('');
+    if(tags) bottom=`<div class="match-bottom"><div class="preds-list">${tags}</div></div>`;
+  } else if(myPred){
+    bottom=`<div class="match-bottom">Мой прогноз: <span class="my-pred">${myPred.home_score}-${myPred.away_score}</span></div>`;
+  }
+  const scoreStr=result
+    ?`<span class="result-score">${result.home_score}:${result.away_score}</span>`
+    :`<div class="match-time">${f.time}</div><div class="match-meta">GMT+3 · Гр.${m.g}</div>`;
+  return `<div class="match-card${myPred?' has-pred':''}" onclick="showPage('match','${m.id}')">
+    <div class="match-top">
+      <div class="team-block"><div class="team-flag">${m.hf}</div><div class="team-name">${m.home}</div></div>
+      <div class="vs-block">${scoreStr}<span class="match-status ${st.cls}">${st.label}</span></div>
+      <div class="team-block right"><div class="team-flag">${m.af}</div><div class="team-name">${m.away}</div></div>
+    </div>${bottom}</div>`;
+}
+
+function buildDayGroups(matches){
   const byDay={};
-  MATCHES.forEach(m=>{
+  matches.forEach(m=>{
     const f=fmtMSK(m.ts);
     if(!byDay[f.key])byDay[f.key]=[];
     byDay[f.key].push(m);
@@ -412,34 +442,46 @@ function renderMatches(){
     const[y,mo,da]=dk.split('-');
     const wd=new Date(Date.UTC(+y,+mo-1,+da)).getUTCDay();
     html+=`<div class="day-header">📅 ${+da} ${monthsRu[+mo-1]} — ${dayNamesRu[wd]}</div>`;
-    byDay[dk].forEach(m=>{
-      const f=fmtMSK(m.ts);
-      const st=getMatchStatus(m);
-      const preds=allPredictions[m.id]||[];
-      const myPred=currentUser?preds.find(p=>p.username===currentUser.username):null;
-      const result=allResults[m.id];
-      let bottom='';
-      if(!isOpen(m)||isFinished(m)){
-        const tags=preds.map(p=>{
-          const pts=result?calcPoints(p.home_score,p.away_score,result.home_score,result.away_score):null;
-          return `<span class="pred-tag">${p.username}: ${p.home_score}-${p.away_score}${pts!==null?` <span class="pts">(+${pts})</span>`:''}</span>`;
-        }).join('');
-        if(tags) bottom=`<div class="match-bottom"><div class="preds-list">${tags}</div></div>`;
-      } else if(myPred){
-        bottom=`<div class="match-bottom">Мой прогноз: <span class="my-pred">${myPred.home_score}-${myPred.away_score}</span></div>`;
-      }
-      const scoreStr=result
-        ?`<span class="result-score">${result.home_score}:${result.away_score}</span>`
-        :`<div class="match-time">${f.time}</div><div class="match-meta">GMT+3 · Гр.${m.g}</div>`;
-      html+=`<div class="match-card${myPred?' has-pred':''}" onclick="showPage('match','${m.id}')">
-        <div class="match-top">
-          <div class="team-block"><div class="team-flag">${m.hf}</div><div class="team-name">${m.home}</div></div>
-          <div class="vs-block">${scoreStr}<span class="match-status ${st.cls}">${st.label}</span></div>
-          <div class="team-block right"><div class="team-flag">${m.af}</div><div class="team-name">${m.away}</div></div>
-        </div>${bottom}</div>`;
-    });
+    byDay[dk].forEach(m=>{ html+=buildMatchCard(m); });
   }
+  return html;
+}
+
+function renderMatches(){
+  const finished = MATCHES.filter(m=>isFinished(m));
+  const upcoming = MATCHES.filter(m=>!isFinished(m));
+
+  let html='';
+
+  // Секция завершённых матчей (свёрнута по умолчанию)
+  if(finished.length>0){
+    html+=`<div class="finished-section">
+      <div class="finished-header" onclick="toggleFinished()">
+        <span>✅ Завершённые матчи (${finished.length})</span>
+        <span id="finishedArrow" style="transition:transform 0.2s;">▼</span>
+      </div>
+      <div id="finishedList" style="display:none;">
+        ${buildDayGroups(finished)}
+      </div>
+    </div>`;
+  }
+
+  // Предстоящие матчи
+  html += buildDayGroups(upcoming);
+
   document.getElementById('matchList').innerHTML=html;
+}
+
+function toggleFinished(){
+  const list=document.getElementById('finishedList');
+  const arrow=document.getElementById('finishedArrow');
+  if(list.style.display==='none'){
+    list.style.display='block';
+    arrow.style.transform='rotate(180deg)';
+  } else {
+    list.style.display='none';
+    arrow.style.transform='rotate(0deg)';
+  }
 }
 
 // ====== СТРАНИЦА МАТЧА ======
