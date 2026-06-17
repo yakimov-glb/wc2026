@@ -39,9 +39,9 @@ body{font-family:'Inter',sans-serif;background:#0D1B2A;min-height:100vh;color:#E
 .match-card:hover{border-color:#2E5A8C}
 .match-card.has-pred{border-left:3px solid #F4A90A}
 .match-top{display:flex;align-items:center;padding:10px 12px;gap:8px}
-.team-block{flex:1}.team-block.right{text-align:right}
+.team-block{flex:1}.team-block.right{text-align:right}.team-block.right .team-flag{margin-left:auto}
 .team-name{font-size:13px;font-weight:500;line-height:1.3}
-.team-flag{font-size:24px}
+.team-flag{display:block;width:36px;height:24px;object-fit:cover;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
 .finished-section{margin-bottom:8px}
 .finished-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#162032;border:1px solid #1E3A5C;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:#9BB3CC;transition:all 0.15s;margin-bottom:4px}
 .finished-header:hover{border-color:#2E5A8C;color:#E8EDF2}
@@ -64,7 +64,7 @@ body{font-family:'Inter',sans-serif;background:#0D1B2A;min-height:100vh;color:#E
 .match-hero{background:#162032;border:1px solid #1E3A5C;border-radius:12px;padding:20px;text-align:center;margin-bottom:14px}
 .hero-teams{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:8px}
 .hero-team{text-align:center}
-.hero-flag{font-size:32px;display:block}
+.hero-flag{display:block;width:64px;height:43px;object-fit:cover;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,0.4);margin:0 auto}
 .hero-name{font-size:13px;font-weight:500;margin-top:4px}
 .hero-vs{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#2E5A8C}
 .hero-date{font-size:12px;color:#6B8AA8;margin-top:4px}
@@ -189,78 +189,78 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // ====== МАТЧИ ======
 function msk(y,mo,d,h,m){return Date.UTC(y,mo-1,d,h-3,m||0)}
 const MATCHES=[
-  {id:'t1m01',g:'A',home:'Мексика',away:'ЮАР',hf:'🇲🇽',af:'🇿🇦',ts:msk(2026,6,11,22,0),venue:'Estadio Azteca, Мехико'},
-  {id:'t1m02',g:'A',home:'Южная Корея',away:'Чехия',hf:'🇰🇷',af:'🇨🇿',ts:msk(2026,6,12,5,0),venue:'Estadio Akron, Гвадалахара'},
-  {id:'t1m03',g:'B',home:'Канада',away:'Босния и Герц.',hf:'🇨🇦',af:'🇧🇦',ts:msk(2026,6,12,22,0),venue:'BMO Field, Торонто'},
-  {id:'t1m04',g:'D',home:'США',away:'Парагвай',hf:'🇺🇸',af:'🇵🇾',ts:msk(2026,6,13,4,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'t1m05',g:'B',home:'Катар',away:'Швейцария',hf:'🇶🇦',af:'🇨🇭',ts:msk(2026,6,13,22,0),venue:"Levi's Stadium, Санта-Клара"},
-  {id:'t1m06',g:'C',home:'Бразилия',away:'Марокко',hf:'🇧🇷',af:'🇲🇦',ts:msk(2026,6,14,1,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'t1m07',g:'C',home:'Гаити',away:'Шотландия',hf:'🇭🇹',af:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',ts:msk(2026,6,14,4,0),venue:'Gillette Stadium, Бостон'},
-  {id:'t1m08',g:'D',home:'Австралия',away:'Турция',hf:'🇦🇺',af:'🇹🇷',ts:msk(2026,6,14,7,0),venue:'BC Place, Ванкувер'},
-  {id:'t1m09',g:'E',home:'Германия',away:'Кюрасао',hf:'🇩🇪',af:'🇨🇼',ts:msk(2026,6,14,20,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'t1m10',g:'F',home:'Нидерланды',away:'Япония',hf:'🇳🇱',af:'🇯🇵',ts:msk(2026,6,14,23,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'t1m11',g:'E',home:'Кот-д\'Ивуар',away:'Эквадор',hf:'🇨🇮',af:'🇪🇨',ts:msk(2026,6,15,2,0),venue:'Lincoln Financial Field, Филадельфия'},
-  {id:'t1m12',g:'F',home:'Швеция',away:'Тунис',hf:'🇸🇪',af:'🇹🇳',ts:msk(2026,6,15,5,0),venue:'Estadio BBVA, Монтеррей'},
-  {id:'t1m13',g:'H',home:'Испания',away:'Кабо-Верде',hf:'🇪🇸',af:'🇨🇻',ts:msk(2026,6,15,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'t1m14',g:'G',home:'Бельгия',away:'Египет',hf:'🇧🇪',af:'🇪🇬',ts:msk(2026,6,15,22,0),venue:'Lumen Field, Сиэтл'},
-  {id:'t1m15',g:'H',home:'Саудовская Аравия',away:'Уругвай',hf:'🇸🇦',af:'🇺🇾',ts:msk(2026,6,16,1,0),venue:'Hard Rock Stadium, Майами'},
-  {id:'t1m16',g:'G',home:'Иран',away:'Новая Зеландия',hf:'🇮🇷',af:'🇳🇿',ts:msk(2026,6,16,4,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'t1m17',g:'I',home:'Франция',away:'Сенегал',hf:'🇫🇷',af:'🇸🇳',ts:msk(2026,6,16,22,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'t1m18',g:'I',home:'Ирак',away:'Норвегия',hf:'🇮🇶',af:'🇳🇴',ts:msk(2026,6,17,1,0),venue:'Gillette Stadium, Бостон'},
-  {id:'t1m19',g:'J',home:'Аргентина',away:'Алжир',hf:'🇦🇷',af:'🇩🇿',ts:msk(2026,6,17,4,0),venue:'Arrowhead Stadium, Канзас-Сити'},
-  {id:'t1m20',g:'J',home:'Австрия',away:'Иордания',hf:'🇦🇹',af:'🇯🇴',ts:msk(2026,6,17,7,0),venue:"Levi's Stadium, Санта-Клара"},
-  {id:'t1m21',g:'K',home:'Португалия',away:'ДР Конго',hf:'🇵🇹',af:'🇨🇩',ts:msk(2026,6,17,20,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'t1m22',g:'L',home:'Англия',away:'Хорватия',hf:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',af:'🇭🇷',ts:msk(2026,6,17,23,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'t1m23',g:'L',home:'Гана',away:'Панама',hf:'🇬🇭',af:'🇵🇦',ts:msk(2026,6,18,2,0),venue:'BMO Field, Торонто'},
-  {id:'t1m24',g:'K',home:'Узбекистан',away:'Колумбия',hf:'🇺🇿',af:'🇨🇴',ts:msk(2026,6,18,5,0),venue:'Estadio Azteca, Мехико'},
-  {id:'t2m01',g:'A',home:'Чехия',away:'ЮАР',hf:'🇨🇿',af:'🇿🇦',ts:msk(2026,6,18,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'t2m02',g:'B',home:'Швейцария',away:'Босния и Герц.',hf:'🇨🇭',af:'🇧🇦',ts:msk(2026,6,18,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'t2m03',g:'B',home:'Канада',away:'Катар',hf:'🇨🇦',af:'🇶🇦',ts:msk(2026,6,19,1,0),venue:'BC Place, Ванкувер'},
-  {id:'t2m04',g:'A',home:'Мексика',away:'Южная Корея',hf:'🇲🇽',af:'🇰🇷',ts:msk(2026,6,19,6,0),venue:'Estadio Akron, Гвадалахара'},
-  {id:'t2m05',g:'D',home:'США',away:'Австралия',hf:'🇺🇸',af:'🇦🇺',ts:msk(2026,6,19,22,0),venue:'Lumen Field, Сиэтл'},
-  {id:'t2m06',g:'C',home:'Шотландия',away:'Марокко',hf:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',af:'🇲🇦',ts:msk(2026,6,20,1,0),venue:'Gillette Stadium, Бостон'},
-  {id:'t2m07',g:'C',home:'Бразилия',away:'Гаити',hf:'🇧🇷',af:'🇭🇹',ts:msk(2026,6,20,4,0),venue:'Lincoln Financial Field, Филадельфия'},
-  {id:'t2m08',g:'D',home:'Турция',away:'Парагвай',hf:'🇹🇷',af:'🇵🇾',ts:msk(2026,6,20,6,0),venue:"Levi's Stadium, Санта-Клара"},
-  {id:'t2m09',g:'F',home:'Нидерланды',away:'Швеция',hf:'🇳🇱',af:'🇸🇪',ts:msk(2026,6,20,20,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'t2m10',g:'E',home:'Германия',away:'Кот-д\'Ивуар',hf:'🇩🇪',af:'🇨🇮',ts:msk(2026,6,20,23,0),venue:'BMO Field, Торонто'},
-  {id:'t2m11',g:'E',home:'Эквадор',away:'Кюрасао',hf:'🇪🇨',af:'🇨🇼',ts:msk(2026,6,21,3,0),venue:'Arrowhead Stadium, Канзас-Сити'},
-  {id:'t2m12',g:'F',home:'Тунис',away:'Япония',hf:'🇹🇳',af:'🇯🇵',ts:msk(2026,6,21,7,0),venue:'Estadio BBVA, Монтеррей'},
-  {id:'t2m13',g:'H',home:'Испания',away:'Саудовская Аравия',hf:'🇪🇸',af:'🇸🇦',ts:msk(2026,6,21,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'t2m14',g:'G',home:'Бельгия',away:'Иран',hf:'🇧🇪',af:'🇮🇷',ts:msk(2026,6,21,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'t2m15',g:'H',home:'Уругвай',away:'Кабо-Верде',hf:'🇺🇾',af:'🇨🇻',ts:msk(2026,6,22,1,0),venue:'Hard Rock Stadium, Майами'},
-  {id:'t2m16',g:'G',home:'Новая Зеландия',away:'Египет',hf:'🇳🇿',af:'🇪🇬',ts:msk(2026,6,22,4,0),venue:'BC Place, Ванкувер'},
-  {id:'t2m17',g:'J',home:'Аргентина',away:'Австрия',hf:'🇦🇷',af:'🇦🇹',ts:msk(2026,6,22,20,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'t2m18',g:'I',home:'Франция',away:'Ирак',hf:'🇫🇷',af:'🇮🇶',ts:msk(2026,6,23,0,0),venue:'Lincoln Financial Field, Филадельфия'},
-  {id:'t2m19',g:'I',home:'Норвегия',away:'Сенегал',hf:'🇳🇴',af:'🇸🇳',ts:msk(2026,6,23,3,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'t2m20',g:'J',home:'Иордания',away:'Алжир',hf:'🇯🇴',af:'🇩🇿',ts:msk(2026,6,23,6,0),venue:"Levi's Stadium, Санта-Клара"},
-  {id:'t2m21',g:'K',home:'Португалия',away:'Узбекистан',hf:'🇵🇹',af:'🇺🇿',ts:msk(2026,6,23,20,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'t2m22',g:'L',home:'Англия',away:'Гана',hf:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',af:'🇬🇭',ts:msk(2026,6,23,23,0),venue:'Gillette Stadium, Бостон'},
-  {id:'t2m23',g:'L',home:'Панама',away:'Хорватия',hf:'🇵🇦',af:'🇭🇷',ts:msk(2026,6,24,2,0),venue:'BMO Field, Торонто'},
-  {id:'t2m24',g:'K',home:'Колумбия',away:'ДР Конго',hf:'🇨🇴',af:'🇨🇩',ts:msk(2026,6,24,5,0),venue:'Estadio Akron, Гвадалахара'},
-  {id:'t3m01',g:'B',home:'Швейцария',away:'Канада',hf:'🇨🇭',af:'🇨🇦',ts:msk(2026,6,24,22,0),venue:'BC Place, Ванкувер'},
-  {id:'t3m02',g:'B',home:'Босния',away:'Катар',hf:'🇧🇦',af:'🇶🇦',ts:msk(2026,6,24,22,0),venue:'Lumen Field, Сиэтл'},
-  {id:'t3m03',g:'C',home:'Шотландия',away:'Бразилия',hf:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',af:'🇧🇷',ts:msk(2026,6,25,1,0),venue:'Hard Rock Stadium, Майами'},
-  {id:'t3m04',g:'C',home:'Марокко',away:'Гаити',hf:'🇲🇦',af:'🇭🇹',ts:msk(2026,6,25,1,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'t3m05',g:'A',home:'Чехия',away:'Мексика',hf:'🇨🇿',af:'🇲🇽',ts:msk(2026,6,25,4,0),venue:'Estadio Azteca, Мехико'},
-  {id:'t3m06',g:'A',home:'ЮАР',away:'Южная Корея',hf:'🇿🇦',af:'🇰🇷',ts:msk(2026,6,25,4,0),venue:'Estadio BBVA, Монтеррей'},
-  {id:'t3m07',g:'E',home:'Эквадор',away:'Германия',hf:'🇪🇨',af:'🇩🇪',ts:msk(2026,6,25,23,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'t3m08',g:'E',home:'Кюрасао',away:'Кот-д\'Ивуар',hf:'🇨🇼',af:'🇨🇮',ts:msk(2026,6,25,23,0),venue:'Lincoln Financial Field, Филадельфия'},
-  {id:'t3m09',g:'F',home:'Япония',away:'Швеция',hf:'🇯🇵',af:'🇸🇪',ts:msk(2026,6,26,2,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'t3m10',g:'F',home:'Тунис',away:'Нидерланды',hf:'🇹🇳',af:'🇳🇱',ts:msk(2026,6,26,2,0),venue:'Arrowhead Stadium, Канзас-Сити'},
-  {id:'t3m11',g:'D',home:'Турция',away:'США',hf:'🇹🇷',af:'🇺🇸',ts:msk(2026,6,26,5,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'t3m12',g:'D',home:'Парагвай',away:'Австралия',hf:'🇵🇾',af:'🇦🇺',ts:msk(2026,6,26,5,0),venue:"Levi's Stadium, Санта-Клара"},
-  {id:'t3m13',g:'I',home:'Норвегия',away:'Франция',hf:'🇳🇴',af:'🇫🇷',ts:msk(2026,6,26,22,0),venue:'Gillette Stadium, Бостон'},
-  {id:'t3m14',g:'I',home:'Сенегал',away:'Ирак',hf:'🇸🇳',af:'🇮🇶',ts:msk(2026,6,26,22,0),venue:'BMO Field, Торонто'},
-  {id:'t3m15',g:'H',home:'Уругвай',away:'Испания',hf:'🇺🇾',af:'🇪🇸',ts:msk(2026,6,27,3,0),venue:'Estadio Akron, Гвадалахара'},
-  {id:'t3m16',g:'H',home:'Кабо-Верде',away:'Саудовская Аравия',hf:'🇨🇻',af:'🇸🇦',ts:msk(2026,6,27,3,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'t3m17',g:'G',home:'Новая Зеландия',away:'Бельгия',hf:'🇳🇿',af:'🇧🇪',ts:msk(2026,6,27,6,0),venue:'BC Place, Ванкувер'},
-  {id:'t3m18',g:'G',home:'Египет',away:'Иран',hf:'🇪🇬',af:'🇮🇷',ts:msk(2026,6,27,6,0),venue:'Lumen Field, Сиэтл'},
-  {id:'t3m19',g:'L',home:'Панама',away:'Англия',hf:'🇵🇦',af:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',ts:msk(2026,6,28,0,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'t3m20',g:'L',home:'Хорватия',away:'Гана',hf:'🇭🇷',af:'🇬🇭',ts:msk(2026,6,28,0,0),venue:'Lincoln Financial Field, Филадельфия'},
-  {id:'t3m21',g:'K',home:'Колумбия',away:'Португалия',hf:'🇨🇴',af:'🇵🇹',ts:msk(2026,6,28,2,30),venue:'Hard Rock Stadium, Майами'},
-  {id:'t3m22',g:'K',home:'ДР Конго',away:'Узбекистан',hf:'🇨🇩',af:'🇺🇿',ts:msk(2026,6,28,2,30),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'t3m23',g:'J',home:'Алжир',away:'Австрия',hf:'🇩🇿',af:'🇦🇹',ts:msk(2026,6,28,5,0),venue:'Arrowhead Stadium, Канзас-Сити'},
-  {id:'t3m24',g:'J',home:'Иордания',away:'Аргентина',hf:'🇯🇴',af:'🇦🇷',ts:msk(2026,6,28,5,0),venue:'AT&T Stadium, Арлингтон'},
+  {id:'t1m01',g:'A',home:'Мексика',away:'ЮАР',hf:'mx',af:'za',ts:msk(2026,6,11,22,0),venue:'Estadio Azteca, Мехико'},
+  {id:'t1m02',g:'A',home:'Южная Корея',away:'Чехия',hf:'kr',af:'cz',ts:msk(2026,6,12,5,0),venue:'Estadio Akron, Гвадалахара'},
+  {id:'t1m03',g:'B',home:'Канада',away:'Босния и Герц.',hf:'ca',af:'ba',ts:msk(2026,6,12,22,0),venue:'BMO Field, Торонто'},
+  {id:'t1m04',g:'D',home:'США',away:'Парагвай',hf:'us',af:'py',ts:msk(2026,6,13,4,0),venue:'SoFi Stadium, Лос-Анджелес'},
+  {id:'t1m05',g:'B',home:'Катар',away:'Швейцария',hf:'qa',af:'ch',ts:msk(2026,6,13,22,0),venue:"Levi's Stadium, Санта-Клара"},
+  {id:'t1m06',g:'C',home:'Бразилия',away:'Марокко',hf:'br',af:'ma',ts:msk(2026,6,14,1,0),venue:'MetLife Stadium, Нью-Джерси'},
+  {id:'t1m07',g:'C',home:'Гаити',away:'Шотландия',hf:'ht',af:'gb-sct',ts:msk(2026,6,14,4,0),venue:'Gillette Stadium, Бостон'},
+  {id:'t1m08',g:'D',home:'Австралия',away:'Турция',hf:'au',af:'tr',ts:msk(2026,6,14,7,0),venue:'BC Place, Ванкувер'},
+  {id:'t1m09',g:'E',home:'Германия',away:'Кюрасао',hf:'de',af:'cw',ts:msk(2026,6,14,20,0),venue:'NRG Stadium, Хьюстон'},
+  {id:'t1m10',g:'F',home:'Нидерланды',away:'Япония',hf:'nl',af:'jp',ts:msk(2026,6,14,23,0),venue:'AT&T Stadium, Арлингтон'},
+  {id:'t1m11',g:'E',home:'Кот-д\'Ивуар',away:'Эквадор',hf:'ci',af:'ec',ts:msk(2026,6,15,2,0),venue:'Lincoln Financial Field, Филадельфия'},
+  {id:'t1m12',g:'F',home:'Швеция',away:'Тунис',hf:'se',af:'tn',ts:msk(2026,6,15,5,0),venue:'Estadio BBVA, Монтеррей'},
+  {id:'t1m13',g:'H',home:'Испания',away:'Кабо-Верде',hf:'es',af:'cv',ts:msk(2026,6,15,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
+  {id:'t1m14',g:'G',home:'Бельгия',away:'Египет',hf:'be',af:'eg',ts:msk(2026,6,15,22,0),venue:'Lumen Field, Сиэтл'},
+  {id:'t1m15',g:'H',home:'Саудовская Аравия',away:'Уругвай',hf:'sa',af:'uy',ts:msk(2026,6,16,1,0),venue:'Hard Rock Stadium, Майами'},
+  {id:'t1m16',g:'G',home:'Иран',away:'Новая Зеландия',hf:'ir',af:'nz',ts:msk(2026,6,16,4,0),venue:'SoFi Stadium, Лос-Анджелес'},
+  {id:'t1m17',g:'I',home:'Франция',away:'Сенегал',hf:'fr',af:'sn',ts:msk(2026,6,16,22,0),venue:'MetLife Stadium, Нью-Джерси'},
+  {id:'t1m18',g:'I',home:'Ирак',away:'Норвегия',hf:'iq',af:'no',ts:msk(2026,6,17,1,0),venue:'Gillette Stadium, Бостон'},
+  {id:'t1m19',g:'J',home:'Аргентина',away:'Алжир',hf:'ar',af:'dz',ts:msk(2026,6,17,4,0),venue:'Arrowhead Stadium, Канзас-Сити'},
+  {id:'t1m20',g:'J',home:'Австрия',away:'Иордания',hf:'at',af:'jo',ts:msk(2026,6,17,7,0),venue:"Levi's Stadium, Санта-Клара"},
+  {id:'t1m21',g:'K',home:'Португалия',away:'ДР Конго',hf:'pt',af:'cd',ts:msk(2026,6,17,20,0),venue:'NRG Stadium, Хьюстон'},
+  {id:'t1m22',g:'L',home:'Англия',away:'Хорватия',hf:'gb-eng',af:'hr',ts:msk(2026,6,17,23,0),venue:'AT&T Stadium, Арлингтон'},
+  {id:'t1m23',g:'L',home:'Гана',away:'Панама',hf:'gh',af:'pa',ts:msk(2026,6,18,2,0),venue:'BMO Field, Торонто'},
+  {id:'t1m24',g:'K',home:'Узбекистан',away:'Колумбия',hf:'uz',af:'co',ts:msk(2026,6,18,5,0),venue:'Estadio Azteca, Мехико'},
+  {id:'t2m01',g:'A',home:'Чехия',away:'ЮАР',hf:'cz',af:'za',ts:msk(2026,6,18,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
+  {id:'t2m02',g:'B',home:'Швейцария',away:'Босния и Герц.',hf:'ch',af:'ba',ts:msk(2026,6,18,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
+  {id:'t2m03',g:'B',home:'Канада',away:'Катар',hf:'ca',af:'qa',ts:msk(2026,6,19,1,0),venue:'BC Place, Ванкувер'},
+  {id:'t2m04',g:'A',home:'Мексика',away:'Южная Корея',hf:'mx',af:'kr',ts:msk(2026,6,19,6,0),venue:'Estadio Akron, Гвадалахара'},
+  {id:'t2m05',g:'D',home:'США',away:'Австралия',hf:'us',af:'au',ts:msk(2026,6,19,22,0),venue:'Lumen Field, Сиэтл'},
+  {id:'t2m06',g:'C',home:'Шотландия',away:'Марокко',hf:'gb-sct',af:'ma',ts:msk(2026,6,20,1,0),venue:'Gillette Stadium, Бостон'},
+  {id:'t2m07',g:'C',home:'Бразилия',away:'Гаити',hf:'br',af:'ht',ts:msk(2026,6,20,4,0),venue:'Lincoln Financial Field, Филадельфия'},
+  {id:'t2m08',g:'D',home:'Турция',away:'Парагвай',hf:'tr',af:'py',ts:msk(2026,6,20,6,0),venue:"Levi's Stadium, Санта-Клара"},
+  {id:'t2m09',g:'F',home:'Нидерланды',away:'Швеция',hf:'nl',af:'se',ts:msk(2026,6,20,20,0),venue:'NRG Stadium, Хьюстон'},
+  {id:'t2m10',g:'E',home:'Германия',away:'Кот-д\'Ивуар',hf:'de',af:'ci',ts:msk(2026,6,20,23,0),venue:'BMO Field, Торонто'},
+  {id:'t2m11',g:'E',home:'Эквадор',away:'Кюрасао',hf:'ec',af:'cw',ts:msk(2026,6,21,3,0),venue:'Arrowhead Stadium, Канзас-Сити'},
+  {id:'t2m12',g:'F',home:'Тунис',away:'Япония',hf:'tn',af:'jp',ts:msk(2026,6,21,7,0),venue:'Estadio BBVA, Монтеррей'},
+  {id:'t2m13',g:'H',home:'Испания',away:'Саудовская Аравия',hf:'es',af:'sa',ts:msk(2026,6,21,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
+  {id:'t2m14',g:'G',home:'Бельгия',away:'Иран',hf:'be',af:'ir',ts:msk(2026,6,21,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
+  {id:'t2m15',g:'H',home:'Уругвай',away:'Кабо-Верде',hf:'uy',af:'cv',ts:msk(2026,6,22,1,0),venue:'Hard Rock Stadium, Майами'},
+  {id:'t2m16',g:'G',home:'Новая Зеландия',away:'Египет',hf:'nz',af:'eg',ts:msk(2026,6,22,4,0),venue:'BC Place, Ванкувер'},
+  {id:'t2m17',g:'J',home:'Аргентина',away:'Австрия',hf:'ar',af:'at',ts:msk(2026,6,22,20,0),venue:'AT&T Stadium, Арлингтон'},
+  {id:'t2m18',g:'I',home:'Франция',away:'Ирак',hf:'fr',af:'iq',ts:msk(2026,6,23,0,0),venue:'Lincoln Financial Field, Филадельфия'},
+  {id:'t2m19',g:'I',home:'Норвегия',away:'Сенегал',hf:'no',af:'sn',ts:msk(2026,6,23,3,0),venue:'MetLife Stadium, Нью-Джерси'},
+  {id:'t2m20',g:'J',home:'Иордания',away:'Алжир',hf:'jo',af:'dz',ts:msk(2026,6,23,6,0),venue:"Levi's Stadium, Санта-Клара"},
+  {id:'t2m21',g:'K',home:'Португалия',away:'Узбекистан',hf:'pt',af:'uz',ts:msk(2026,6,23,20,0),venue:'NRG Stadium, Хьюстон'},
+  {id:'t2m22',g:'L',home:'Англия',away:'Гана',hf:'gb-eng',af:'gh',ts:msk(2026,6,23,23,0),venue:'Gillette Stadium, Бостон'},
+  {id:'t2m23',g:'L',home:'Панама',away:'Хорватия',hf:'pa',af:'hr',ts:msk(2026,6,24,2,0),venue:'BMO Field, Торонто'},
+  {id:'t2m24',g:'K',home:'Колумбия',away:'ДР Конго',hf:'co',af:'cd',ts:msk(2026,6,24,5,0),venue:'Estadio Akron, Гвадалахара'},
+  {id:'t3m01',g:'B',home:'Швейцария',away:'Канада',hf:'ch',af:'ca',ts:msk(2026,6,24,22,0),venue:'BC Place, Ванкувер'},
+  {id:'t3m02',g:'B',home:'Босния',away:'Катар',hf:'ba',af:'qa',ts:msk(2026,6,24,22,0),venue:'Lumen Field, Сиэтл'},
+  {id:'t3m03',g:'C',home:'Шотландия',away:'Бразилия',hf:'gb-sct',af:'br',ts:msk(2026,6,25,1,0),venue:'Hard Rock Stadium, Майами'},
+  {id:'t3m04',g:'C',home:'Марокко',away:'Гаити',hf:'ma',af:'ht',ts:msk(2026,6,25,1,0),venue:'Mercedes-Benz Stadium, Атланта'},
+  {id:'t3m05',g:'A',home:'Чехия',away:'Мексика',hf:'cz',af:'mx',ts:msk(2026,6,25,4,0),venue:'Estadio Azteca, Мехико'},
+  {id:'t3m06',g:'A',home:'ЮАР',away:'Южная Корея',hf:'za',af:'kr',ts:msk(2026,6,25,4,0),venue:'Estadio BBVA, Монтеррей'},
+  {id:'t3m07',g:'E',home:'Эквадор',away:'Германия',hf:'ec',af:'de',ts:msk(2026,6,25,23,0),venue:'MetLife Stadium, Нью-Джерси'},
+  {id:'t3m08',g:'E',home:'Кюрасао',away:'Кот-д\'Ивуар',hf:'cw',af:'ci',ts:msk(2026,6,25,23,0),venue:'Lincoln Financial Field, Филадельфия'},
+  {id:'t3m09',g:'F',home:'Япония',away:'Швеция',hf:'jp',af:'se',ts:msk(2026,6,26,2,0),venue:'AT&T Stadium, Арлингтон'},
+  {id:'t3m10',g:'F',home:'Тунис',away:'Нидерланды',hf:'tn',af:'nl',ts:msk(2026,6,26,2,0),venue:'Arrowhead Stadium, Канзас-Сити'},
+  {id:'t3m11',g:'D',home:'Турция',away:'США',hf:'tr',af:'us',ts:msk(2026,6,26,5,0),venue:'SoFi Stadium, Лос-Анджелес'},
+  {id:'t3m12',g:'D',home:'Парагвай',away:'Австралия',hf:'py',af:'au',ts:msk(2026,6,26,5,0),venue:"Levi's Stadium, Санта-Клара"},
+  {id:'t3m13',g:'I',home:'Норвегия',away:'Франция',hf:'no',af:'fr',ts:msk(2026,6,26,22,0),venue:'Gillette Stadium, Бостон'},
+  {id:'t3m14',g:'I',home:'Сенегал',away:'Ирак',hf:'sn',af:'iq',ts:msk(2026,6,26,22,0),venue:'BMO Field, Торонто'},
+  {id:'t3m15',g:'H',home:'Уругвай',away:'Испания',hf:'uy',af:'es',ts:msk(2026,6,27,3,0),venue:'Estadio Akron, Гвадалахара'},
+  {id:'t3m16',g:'H',home:'Кабо-Верде',away:'Саудовская Аравия',hf:'cv',af:'sa',ts:msk(2026,6,27,3,0),venue:'NRG Stadium, Хьюстон'},
+  {id:'t3m17',g:'G',home:'Новая Зеландия',away:'Бельгия',hf:'nz',af:'be',ts:msk(2026,6,27,6,0),venue:'BC Place, Ванкувер'},
+  {id:'t3m18',g:'G',home:'Египет',away:'Иран',hf:'eg',af:'ir',ts:msk(2026,6,27,6,0),venue:'Lumen Field, Сиэтл'},
+  {id:'t3m19',g:'L',home:'Панама',away:'Англия',hf:'pa',af:'gb-eng',ts:msk(2026,6,28,0,0),venue:'MetLife Stadium, Нью-Джерси'},
+  {id:'t3m20',g:'L',home:'Хорватия',away:'Гана',hf:'hr',af:'gh',ts:msk(2026,6,28,0,0),venue:'Lincoln Financial Field, Филадельфия'},
+  {id:'t3m21',g:'K',home:'Колумбия',away:'Португалия',hf:'co',af:'pt',ts:msk(2026,6,28,2,30),venue:'Hard Rock Stadium, Майами'},
+  {id:'t3m22',g:'K',home:'ДР Конго',away:'Узбекистан',hf:'cd',af:'uz',ts:msk(2026,6,28,2,30),venue:'Mercedes-Benz Stadium, Атланта'},
+  {id:'t3m23',g:'J',home:'Алжир',away:'Австрия',hf:'dz',af:'at',ts:msk(2026,6,28,5,0),venue:'Arrowhead Stadium, Канзас-Сити'},
+  {id:'t3m24',g:'J',home:'Иордания',away:'Аргентина',hf:'jo',af:'ar',ts:msk(2026,6,28,5,0),venue:'AT&T Stadium, Арлингтон'},
 ].sort((a,b)=>a.ts-b.ts);
 
 // ====== СОСТОЯНИЕ ======
@@ -422,9 +422,9 @@ function buildMatchCard(m){
     :`<div class="match-time">${f.time}</div><div class="match-meta">GMT+3 · Гр.${m.g}</div>`;
   return `<div class="match-card${myPred?' has-pred':''}" onclick="showPage('match','${m.id}')">
     <div class="match-top">
-      <div class="team-block"><div class="team-flag">${m.hf}</div><div class="team-name">${m.home}</div></div>
+      <div class="team-block"><img class="team-flag" src="https://flagcdn.com/w40/${m.hf}.png" onerror="this.style.display='none'" alt="${m.home}"><div class="team-name">${m.home}</div></div>
       <div class="vs-block">${scoreStr}<span class="match-status ${st.cls}">${st.label}</span></div>
-      <div class="team-block right"><div class="team-flag">${m.af}</div><div class="team-name">${m.away}</div></div>
+      <div class="team-block right"><img class="team-flag" src="https://flagcdn.com/w40/${m.af}.png" onerror="this.style.display='none'" alt="${m.away}"><div class="team-name">${m.away}</div></div>
     </div>${bottom}</div>`;
 }
 
@@ -538,9 +538,9 @@ function renderMatchDetail(){
   document.getElementById('matchDetail').innerHTML=`
     <div class="match-hero">
       <div class="hero-teams">
-        <div class="hero-team"><span class="hero-flag">${m.hf}</span><div class="hero-name">${m.home}</div></div>
+        <div class="hero-team"><img class="hero-flag" src="https://flagcdn.com/w80/${m.hf}.png" onerror="this.style.display='none'" alt="${m.home}"><div class="hero-name">${m.home}</div></div>
         ${finished?`<div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#27b44b;letter-spacing:4px;">${result.home_score} : ${result.away_score}</div>`:`<div class="hero-vs">VS</div>`}
-        <div class="hero-team"><span class="hero-flag">${m.af}</span><div class="hero-name">${m.away}</div></div>
+        <div class="hero-team"><img class="hero-flag" src="https://flagcdn.com/w80/${m.af}.png" onerror="this.style.display='none'" alt="${m.away}"><div class="hero-name">${m.away}</div></div>
       </div>
       <div style="font-size:12px;color:#6B8AA8;margin-top:4px;">📅 ${f.date} · ⏰ ${f.time} GMT+3 · Группа ${m.g} · <span class="match-status ${st.cls}">${st.label}</span></div>
     </div>
