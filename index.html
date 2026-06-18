@@ -564,18 +564,35 @@ async function savePred(mid){
 // ====== ТАБЛИЦА ======
 function renderLeaderboard(){
   const pts={}, counts={}, games={};
-  Object.keys(allResults).forEach(mid=>{
-    const r=allResults[mid];
-    const preds=allPredictions[mid]||[];
-    preds.forEach(p=>{
-      const pt=calcPoints(p.home_score,p.away_score,r.home_score,r.away_score);
+  const finishedMatchIds=Object.keys(allResults);
+
+  // Инициализируем всех участников с прогнозами на завершённые матчи
+  finishedMatchIds.forEach(mid=>{
+    (allPredictions[mid]||[]).forEach(p=>{
       if(!pts[p.username]){pts[p.username]=0;counts[p.username]={exact:0,diff:0,res:0};games[p.username]=0;}
-      pts[p.username]+=pt; games[p.username]++;
+    });
+  });
+
+  // Считаем очки
+  finishedMatchIds.forEach(mid=>{
+    const r=allResults[mid];
+    (allPredictions[mid]||[]).forEach(p=>{
+      const pt=calcPoints(p.home_score,p.away_score,r.home_score,r.away_score);
+      pts[p.username]+=pt;
       if(pt===4)counts[p.username].exact++;
       else if(pt===2)counts[p.username].diff++;
       else if(pt===1)counts[p.username].res++;
     });
   });
+
+  // Считаем кол-во матчей отдельно:
+  // для каждого пользователя — сколько завершённых матчей имеют его прогноз
+  Object.keys(pts).forEach(username=>{
+    games[username] = finishedMatchIds.filter(mid=>
+      (allPredictions[mid]||[]).some(p=>p.username===username)
+    ).length;
+  });
+
   const lb=Object.keys(pts).map(u=>({user:u,pts:pts[u],counts:counts[u],games:games[u]}))
     .sort((a,b)=>b.pts-a.pts||b.counts.exact-a.counts.exact);
   const el=document.getElementById('lbContent');
