@@ -361,6 +361,7 @@ function renderNav(){
     const isAdmin = currentUser.is_admin;
     nr.innerHTML=`<span class="nav-user">👤 <strong>${currentUser.username}</strong></span>
       <button class="nav-btn" id="tabMatches" onclick="showPage('matches')">Матчи гр. этап</button>
+      <button class="nav-btn" id="tabPlayoff" onclick="showPage('playoff')">Матчи play-off</button>
       <button class="nav-btn" id="tabLB" onclick="showPage('leaderboard')">Таблица</button>
       ${isAdmin?'<button class="nav-btn" id="tabAdmin" onclick="showPage(\'admin\')">Ред.</button>':''}
       <button class="nav-btn" onclick="doLogout()">Выйти</button>`;
@@ -692,35 +693,35 @@ async function delResult(mid){
 
 // ====== PLAY-OFF МАТЧИ ======
 // ET (UTC-4) → GMT+3: +7h
-function pmsk(y,mo,d,h,m){return Date.UTC(y,mo-1,d,h-7,m||0)}
+function pmsk(y,mo,d,h,m){return Date.UTC(y,mo-1,d,h-3,m||0)}
 
 const PLAYOFF_MATCHES=[
-  // ===== 1/32 финала =====
-  {id:'po_m73',round:'1/32 финала',home:'ЮАР',away:'Канада',hf:'za',af:'ca',ts:pmsk(2026,6,28,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'po_m76',round:'1/32 финала',home:'Бразилия',away:'Япония',hf:'br',af:'jp',ts:pmsk(2026,6,29,20,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'po_m74',round:'1/32 финала',home:'Германия',away:'Парагвай',hf:'de',af:'py',ts:pmsk(2026,6,29,23,30),venue:'Gillette Stadium, Бостон'},
-  {id:'po_m75',round:'1/32 финала',home:'Нидерланды',away:'Марокко',hf:'nl',af:'ma',ts:pmsk(2026,6,30,4,0),venue:'Estadio BBVA, Монтеррей'},
-  {id:'po_m78',round:'1/32 финала',home:'Кот-д\'Ивуар',away:'Норвегия',hf:'ci',af:'no',ts:pmsk(2026,6,30,20,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'po_m77',round:'1/32 финала',home:'Франция',away:'Швеция',hf:'fr',af:'se',ts:pmsk(2026,7,1,0,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'po_m79',round:'1/32 финала',home:'Мексика',away:'Эквадор',hf:'mx',af:'ec',ts:pmsk(2026,7,1,4,0),venue:'Estadio Azteca, Мехико'},
-  {id:'po_m80',round:'1/32 финала',home:'Англия',away:'ДР Конго',hf:'gb-eng',af:'cd',ts:pmsk(2026,7,1,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'po_m82',round:'1/32 финала',home:'Бельгия',away:'Сенегал',hf:'be',af:'sn',ts:pmsk(2026,7,1,23,0),venue:'Lumen Field, Сиэтл'},
-  {id:'po_m81',round:'1/32 финала',home:'США',away:'Босния',hf:'us',af:'ba',ts:pmsk(2026,7,2,3,0),venue:"Levi's Stadium, Санта-Клара"},
-  {id:'po_m84',round:'1/32 финала',home:'Испания',away:'Австрия',hf:'es',af:'at',ts:pmsk(2026,7,2,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'po_m83',round:'1/32 финала',home:'Португалия',away:'Хорватия',hf:'pt',af:'hr',ts:pmsk(2026,7,3,2,0),venue:'BMO Field, Торонто'},
-  {id:'po_m85',round:'1/32 финала',home:'Швейцария',away:'Алжир',hf:'ch',af:'dz',ts:pmsk(2026,7,3,6,0),venue:'BC Place, Ванкувер'},
-  {id:'po_m88',round:'1/32 финала',home:'Австралия',away:'Египет',hf:'au',af:'eg',ts:pmsk(2026,7,3,21,0),venue:'AT&T Stadium, Даллас'},
-  {id:'po_m86',round:'1/32 финала',home:'Аргентина',away:'Кабо-Верде',hf:'ar',af:'cv',ts:pmsk(2026,7,4,1,0),venue:'Hard Rock Stadium, Майами'},
-  {id:'po_m87',round:'1/32 финала',home:'Колумбия',away:'Гана',hf:'co',af:'gh',ts:pmsk(2026,7,4,4,30),venue:'Arrowhead Stadium, Канзас-Сити'},
   // ===== 1/16 финала =====
-  {id:'po_m90',round:'1/16 финала',home:'Победитель М73',away:'Победитель М75',hf:'tbd',af:'tbd',ts:pmsk(2026,7,4,20,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'po_m89',round:'1/16 финала',home:'Победитель М74',away:'Победитель М77',hf:'tbd',af:'tbd',ts:pmsk(2026,7,5,0,0),venue:'Lincoln Financial Field, Филадельфия'},
-  {id:'po_m91',round:'1/16 финала',home:'Победитель М76',away:'Победитель М78',hf:'tbd',af:'tbd',ts:pmsk(2026,7,5,23,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'po_m92',round:'1/16 финала',home:'Победитель М79',away:'Победитель М80',hf:'tbd',af:'tbd',ts:pmsk(2026,7,6,3,0),venue:'Estadio Azteca, Мехико'},
-  {id:'po_m93',round:'1/16 финала',home:'Победитель М83',away:'Победитель М84',hf:'tbd',af:'tbd',ts:pmsk(2026,7,6,22,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'po_m94',round:'1/16 финала',home:'Победитель М81',away:'Победитель М82',hf:'tbd',af:'tbd',ts:pmsk(2026,7,7,3,0),venue:'Lumen Field, Сиэтл'},
-  {id:'po_m95',round:'1/16 финала',home:'Победитель М86',away:'Победитель М88',hf:'tbd',af:'tbd',ts:pmsk(2026,7,7,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'po_m96',round:'1/16 финала',home:'Победитель М85',away:'Победитель М87',hf:'tbd',af:'tbd',ts:pmsk(2026,7,7,23,0),venue:'BC Place, Ванкувер'},
+  {id:'po_m73',round:'1/16 финала',home:'ЮАР',away:'Канада',hf:'za',af:'ca',ts:pmsk(2026,6,28,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
+  {id:'po_m76',round:'1/16 финала',home:'Бразилия',away:'Япония',hf:'br',af:'jp',ts:pmsk(2026,6,29,20,0),venue:'NRG Stadium, Хьюстон'},
+  {id:'po_m74',round:'1/16 финала',home:'Германия',away:'Парагвай',hf:'de',af:'py',ts:pmsk(2026,6,29,23,30),venue:'Gillette Stadium, Бостон'},
+  {id:'po_m75',round:'1/16 финала',home:'Нидерланды',away:'Марокко',hf:'nl',af:'ma',ts:pmsk(2026,6,30,4,0),venue:'Estadio BBVA, Монтеррей'},
+  {id:'po_m78',round:'1/16 финала',home:'Кот-д\'Ивуар',away:'Норвегия',hf:'ci',af:'no',ts:pmsk(2026,6,30,20,0),venue:'AT&T Stadium, Арлингтон'},
+  {id:'po_m77',round:'1/16 финала',home:'Франция',away:'Швеция',hf:'fr',af:'se',ts:pmsk(2026,7,1,0,0),venue:'MetLife Stadium, Нью-Джерси'},
+  {id:'po_m79',round:'1/16 финала',home:'Мексика',away:'Эквадор',hf:'mx',af:'ec',ts:pmsk(2026,7,1,4,0),venue:'Estadio Azteca, Мехико'},
+  {id:'po_m80',round:'1/16 финала',home:'Англия',away:'ДР Конго',hf:'gb-eng',af:'cd',ts:pmsk(2026,7,1,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
+  {id:'po_m82',round:'1/16 финала',home:'Бельгия',away:'Сенегал',hf:'be',af:'sn',ts:pmsk(2026,7,1,23,0),venue:'Lumen Field, Сиэтл'},
+  {id:'po_m81',round:'1/16 финала',home:'США',away:'Босния',hf:'us',af:'ba',ts:pmsk(2026,7,2,3,0),venue:"Levi's Stadium, Санта-Клара"},
+  {id:'po_m84',round:'1/16 финала',home:'Испания',away:'Австрия',hf:'es',af:'at',ts:pmsk(2026,7,2,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
+  {id:'po_m83',round:'1/16 финала',home:'Португалия',away:'Хорватия',hf:'pt',af:'hr',ts:pmsk(2026,7,3,2,0),venue:'BMO Field, Торонто'},
+  {id:'po_m85',round:'1/16 финала',home:'Швейцария',away:'Алжир',hf:'ch',af:'dz',ts:pmsk(2026,7,3,6,0),venue:'BC Place, Ванкувер'},
+  {id:'po_m88',round:'1/16 финала',home:'Австралия',away:'Египет',hf:'au',af:'eg',ts:pmsk(2026,7,3,21,0),venue:'AT&T Stadium, Даллас'},
+  {id:'po_m86',round:'1/16 финала',home:'Аргентина',away:'Кабо-Верде',hf:'ar',af:'cv',ts:pmsk(2026,7,4,1,0),venue:'Hard Rock Stadium, Майами'},
+  {id:'po_m87',round:'1/16 финала',home:'Колумбия',away:'Гана',hf:'co',af:'gh',ts:pmsk(2026,7,4,4,30),venue:'Arrowhead Stadium, Канзас-Сити'},
+  // ===== 1/8 финала =====
+  {id:'po_m90',round:'1/8 финала',home:'Победитель М73',away:'Победитель М75',hf:'tbd',af:'tbd',ts:pmsk(2026,7,4,20,0),venue:'NRG Stadium, Хьюстон'},
+  {id:'po_m89',round:'1/8 финала',home:'Победитель М74',away:'Победитель М77',hf:'tbd',af:'tbd',ts:pmsk(2026,7,5,0,0),venue:'Lincoln Financial Field, Филадельфия'},
+  {id:'po_m91',round:'1/8 финала',home:'Победитель М76',away:'Победитель М78',hf:'tbd',af:'tbd',ts:pmsk(2026,7,5,23,0),venue:'MetLife Stadium, Нью-Джерси'},
+  {id:'po_m92',round:'1/8 финала',home:'Победитель М79',away:'Победитель М80',hf:'tbd',af:'tbd',ts:pmsk(2026,7,6,3,0),venue:'Estadio Azteca, Мехико'},
+  {id:'po_m93',round:'1/8 финала',home:'Победитель М83',away:'Победитель М84',hf:'tbd',af:'tbd',ts:pmsk(2026,7,6,22,0),venue:'AT&T Stadium, Арлингтон'},
+  {id:'po_m94',round:'1/8 финала',home:'Победитель М81',away:'Победитель М82',hf:'tbd',af:'tbd',ts:pmsk(2026,7,7,3,0),venue:'Lumen Field, Сиэтл'},
+  {id:'po_m95',round:'1/8 финала',home:'Победитель М86',away:'Победитель М88',hf:'tbd',af:'tbd',ts:pmsk(2026,7,7,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
+  {id:'po_m96',round:'1/8 финала',home:'Победитель М85',away:'Победитель М87',hf:'tbd',af:'tbd',ts:pmsk(2026,7,7,23,0),venue:'BC Place, Ванкувер'},
   // ===== Четвертьфиналы =====
   {id:'po_qf1',round:'Четвертьфинал',home:'ТБД',away:'ТБД',hf:'tbd',af:'tbd',ts:pmsk(2026,7,9,22,0),venue:'ТБД'},
   {id:'po_qf2',round:'Четвертьфинал',home:'ТБД',away:'ТБД',hf:'tbd',af:'tbd',ts:pmsk(2026,7,10,2,0),venue:'ТБД'},
@@ -773,7 +774,7 @@ function buildPlayoffMatchCard(m){
 function renderPlayoffMatches(){
   const finished = PLAYOFF_MATCHES.filter(m=>isFinished(m));
   const upcoming = PLAYOFF_MATCHES.filter(m=>!isFinished(m));
-  const rounds_order=['1/32 финала','1/16 финала','Четвертьфинал','Полуфинал','Матч за 3-е место','Финал'];
+  const rounds_order=['1/16 финала','1/8 финала','Четвертьфинал','Полуфинал','Матч за 3-е место','Финал'];
   function buildRoundGroups(matches){
     const byRound={};
     matches.forEach(m=>{ if(!byRound[m.round])byRound[m.round]=[]; byRound[m.round].push(m); });
