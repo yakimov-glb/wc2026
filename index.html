@@ -761,7 +761,7 @@ function buildPlayoffMatchCard(m){
   }
   const scoreStr=result
     ?`<span class="result-score">${result.home_score}:${result.away_score}</span>`
-    :`<div class="match-time">${f.time}</div><div class="match-meta">GMT+3</div>`;
+    :`<div class="match-time">${f.time}</div><div class="match-meta">GMT+3 · ${m.round}</div>`;
   return `<div class="match-card${myPred?' has-pred':''}" onclick="showPage('playoffmatch','${m.id}')">
     <div class="match-top">
       <div class="team-block">${homeFlagHtml}<div class="team-name">${m.home}</div></div>
@@ -771,21 +771,28 @@ function buildPlayoffMatchCard(m){
 }
 
 // ====== PLAY-OFF: рендер списка матчей ======
+function buildPlayoffDayGroups(matches){
+  const byDay={};
+  matches.forEach(m=>{
+    const f=fmtMSK(m.ts);
+    if(!byDay[f.key])byDay[f.key]=[];
+    byDay[f.key].push(m);
+  });
+  const dayNamesRu=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+  const monthsRu=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  let html='';
+  for(const dk of Object.keys(byDay).sort()){
+    const[y,mo,da]=dk.split('-');
+    const wd=new Date(Date.UTC(+y,+mo-1,+da)).getUTCDay();
+    html+=`<div class="day-header">📅 ${+da} ${monthsRu[+mo-1]} — ${dayNamesRu[wd]}</div>`;
+    byDay[dk].forEach(m=>{ html+=buildPlayoffMatchCard(m); });
+  }
+  return html;
+}
+
 function renderPlayoffMatches(){
   const finished = PLAYOFF_MATCHES.filter(m=>isFinished(m));
   const upcoming = PLAYOFF_MATCHES.filter(m=>!isFinished(m));
-  const rounds_order=['1/16 финала','1/8 финала','Четвертьфинал','Полуфинал','Матч за 3-е место','Финал'];
-  function buildRoundGroups(matches){
-    const byRound={};
-    matches.forEach(m=>{ if(!byRound[m.round])byRound[m.round]=[]; byRound[m.round].push(m); });
-    let html='';
-    rounds_order.forEach(r=>{
-      if(!byRound[r]) return;
-      html+=`<div class="day-header">🏆 ${r}</div>`;
-      byRound[r].forEach(m=>{ html+=buildPlayoffMatchCard(m); });
-    });
-    return html;
-  }
   let html='';
   if(finished.length>0){
     html+=`<div class="finished-section">
@@ -793,10 +800,10 @@ function renderPlayoffMatches(){
         <span>✅ Завершённые матчи (${finished.length})</span>
         <span id="playoffFinishedArrow" style="transition:transform 0.2s;">▼</span>
       </div>
-      <div id="playoffFinishedList" style="display:none;">${buildRoundGroups(finished)}</div>
+      <div id="playoffFinishedList" style="display:none;">${buildPlayoffDayGroups(finished)}</div>
     </div>`;
   }
-  html += buildRoundGroups(upcoming);
+  html += buildPlayoffDayGroups(upcoming);
   document.getElementById('playoffMatchList').innerHTML = html || '<div style="color:#6B8AA8;padding:20px;text-align:center;">Матчи play-off начнутся 28 июня 2026</div>';
 }
 
