@@ -161,7 +161,7 @@ body{font-family:'Inter',sans-serif;background:#0D1B2A;min-height:100vh;color:#E
 
 <div id="page-match" class="page">
   <div class="match-page-wrap">
-    <button class="back-btn" onclick="showPage('matches')">← Назад к матчам</button>
+    <button class="back-btn" onclick="goBackFromMatch()">← Назад к матчам</button>
     <div id="matchDetail"></div>
   </div>
 </div>
@@ -343,7 +343,7 @@ function showPage(id, matchId){
   document.getElementById('page-'+id).classList.add('active');
   if(matchId) currentMatchId=matchId;
   if(id==='matches') renderMatches();
-  if(id==='match') renderMatchDetail();
+  if(id==='match'){matchContext='matches'; renderMatchDetail();}
   if(id==='playoff') renderPlayoffMatches();
   if(id==='playoffmatch') renderPlayoffMatchDetail();
   if(id==='leaderboard') renderLeaderboard();
@@ -807,6 +807,10 @@ function renderPlayoffMatches(){
   document.getElementById('playoffMatchList').innerHTML = html || '<div style="color:#6B8AA8;padding:20px;text-align:center;">Матчи play-off начнутся 28 июня 2026</div>';
 }
 
+function goBackFromMatch(){
+  showPage(matchContext);
+}
+
 function togglePlayoffFinished(){
   const list=document.getElementById('playoffFinishedList');
   const arrow=document.getElementById('playoffFinishedArrow');
@@ -816,6 +820,7 @@ function togglePlayoffFinished(){
 
 // ====== PLAY-OFF: страница матча ======
 let currentPlayoffMatchId = null;
+let matchContext = 'matches'; // tracks where user came from
 function renderPlayoffMatchDetail(){
   const m=PLAYOFF_MATCHES.find(x=>x.id===currentPlayoffMatchId); if(!m)return;
   const f=fmtMSK(m.ts);
@@ -956,6 +961,7 @@ showPage = function(id, matchId){
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.getElementById('page-match').classList.add('active');
     if(matchId) currentPlayoffMatchId=matchId;
+    matchContext='playoff';
     renderPlayoffMatchDetail();
     document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active-tab'));
     const el=document.getElementById('tabPlayoff'); if(el)el.classList.add('active-tab');
