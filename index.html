@@ -154,7 +154,7 @@ body{font-family:'Inter',sans-serif;background:#0D1B2A;min-height:100vh;color:#E
 
 <div id="page-matches" class="page">
   <div class="main-wrap">
-    <div class="section-title">⚽ Матчи ЧМ 2026</div>
+    <div class="section-title">⚽ Матчи ЧМ 2026 — групповой этап</div>
     <div id="matchList"><div class="loading"><span class="spinner"></span>Загрузка...</div></div>
   </div>
 </div>
@@ -166,10 +166,28 @@ body{font-family:'Inter',sans-serif;background:#0D1B2A;min-height:100vh;color:#E
   </div>
 </div>
 
+<div id="page-playoff" class="page">
+  <div class="main-wrap">
+    <div class="section-title">⚽ Матчи ЧМ 2026 — play-off</div>
+    <div id="playoffMatchList"><div class="loading"><span class="spinner"></span>Загрузка...</div></div>
+  </div>
+</div>
+
 <div id="page-leaderboard" class="page">
   <div class="lb-wrap">
-    <div class="section-title">🏆 Таблица участников</div>
-    <div id="lbContent"><div class="loading"><span class="spinner"></span>Загрузка...</div></div>
+    <!-- Групповой этап — свёрнут -->
+    <div class="finished-section" style="margin-bottom:16px;">
+      <div class="finished-header" onclick="toggleGroupLB()" id="groupLBHeader">
+        <span>📊 Таблица участников — групповой этап</span>
+        <span id="groupLBArrow" style="transition:transform 0.2s;">▼</span>
+      </div>
+      <div id="groupLBContent" style="display:none;">
+        <div id="lbContent"><div class="loading"><span class="spinner"></span>Загрузка...</div></div>
+      </div>
+    </div>
+    <!-- Play-off — всегда видна -->
+    <div class="section-title">🏆 Таблица участников — play-off</div>
+    <div id="lbPlayoffContent"><div class="loading"><span class="spinner"></span>Загрузка...</div></div>
   </div>
 </div>
 
@@ -326,10 +344,12 @@ function showPage(id, matchId){
   if(matchId) currentMatchId=matchId;
   if(id==='matches') renderMatches();
   if(id==='match') renderMatchDetail();
+  if(id==='playoff') renderPlayoffMatches();
+  if(id==='playoffmatch') renderPlayoffMatchDetail();
   if(id==='leaderboard') renderLeaderboard();
   if(id==='admin') renderAdmin();
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active-tab'));
-  const map={matches:'tabMatches',leaderboard:'tabLB',admin:'tabAdmin'};
+  const map={matches:'tabMatches',playoff:'tabPlayoff',leaderboard:'tabLB',admin:'tabAdmin'};
   if(map[id]){const el=document.getElementById(map[id]);if(el)el.classList.add('active-tab');}
 }
 
@@ -340,7 +360,7 @@ function renderNav(){
   } else {
     const isAdmin = currentUser.is_admin;
     nr.innerHTML=`<span class="nav-user">👤 <strong>${currentUser.username}</strong></span>
-      <button class="nav-btn" id="tabMatches" onclick="showPage('matches')">Матчи</button>
+      <button class="nav-btn" id="tabMatches" onclick="showPage('matches')">Матчи гр. этап</button>
       <button class="nav-btn" id="tabLB" onclick="showPage('leaderboard')">Таблица</button>
       ${isAdmin?'<button class="nav-btn" id="tabAdmin" onclick="showPage(\'admin\')">Ред.</button>':''}
       <button class="nav-btn" onclick="doLogout()">Выйти</button>`;
@@ -669,6 +689,300 @@ async function delResult(mid){
     showPage('matches');
   }
 })();
+
+// ====== PLAY-OFF МАТЧИ ======
+// ET (UTC-4) → GMT+3: +7h
+function pmsk(y,mo,d,h,m){return Date.UTC(y,mo-1,d,h-7,m||0)}
+
+const PLAYOFF_MATCHES=[
+  // ===== 1/32 финала =====
+  {id:'po_m73',round:'1/32 финала',home:'ЮАР',away:'Канада',hf:'za',af:'ca',ts:pmsk(2026,6,28,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
+  {id:'po_m76',round:'1/32 финала',home:'Бразилия',away:'Япония',hf:'br',af:'jp',ts:pmsk(2026,6,29,20,0),venue:'NRG Stadium, Хьюстон'},
+  {id:'po_m74',round:'1/32 финала',home:'Германия',away:'Парагвай',hf:'de',af:'py',ts:pmsk(2026,6,29,23,30),venue:'Gillette Stadium, Бостон'},
+  {id:'po_m75',round:'1/32 финала',home:'Нидерланды',away:'Марокко',hf:'nl',af:'ma',ts:pmsk(2026,6,30,4,0),venue:'Estadio BBVA, Монтеррей'},
+  {id:'po_m78',round:'1/32 финала',home:'Кот-д\'Ивуар',away:'Норвегия',hf:'ci',af:'no',ts:pmsk(2026,6,30,20,0),venue:'AT&T Stadium, Арлингтон'},
+  {id:'po_m77',round:'1/32 финала',home:'Франция',away:'Швеция',hf:'fr',af:'se',ts:pmsk(2026,7,1,0,0),venue:'MetLife Stadium, Нью-Джерси'},
+  {id:'po_m79',round:'1/32 финала',home:'Мексика',away:'Эквадор',hf:'mx',af:'ec',ts:pmsk(2026,7,1,4,0),venue:'Estadio Azteca, Мехико'},
+  {id:'po_m80',round:'1/32 финала',home:'Англия',away:'ДР Конго',hf:'gb-eng',af:'cd',ts:pmsk(2026,7,1,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
+  {id:'po_m82',round:'1/32 финала',home:'Бельгия',away:'Сенегал',hf:'be',af:'sn',ts:pmsk(2026,7,1,23,0),venue:'Lumen Field, Сиэтл'},
+  {id:'po_m81',round:'1/32 финала',home:'США',away:'Босния',hf:'us',af:'ba',ts:pmsk(2026,7,2,3,0),venue:"Levi's Stadium, Санта-Клара"},
+  {id:'po_m84',round:'1/32 финала',home:'Испания',away:'Австрия',hf:'es',af:'at',ts:pmsk(2026,7,2,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
+  {id:'po_m83',round:'1/32 финала',home:'Португалия',away:'Хорватия',hf:'pt',af:'hr',ts:pmsk(2026,7,3,2,0),venue:'BMO Field, Торонто'},
+  {id:'po_m85',round:'1/32 финала',home:'Швейцария',away:'Алжир',hf:'ch',af:'dz',ts:pmsk(2026,7,3,6,0),venue:'BC Place, Ванкувер'},
+  {id:'po_m88',round:'1/32 финала',home:'Австралия',away:'Египет',hf:'au',af:'eg',ts:pmsk(2026,7,3,21,0),venue:'AT&T Stadium, Даллас'},
+  {id:'po_m86',round:'1/32 финала',home:'Аргентина',away:'Кабо-Верде',hf:'ar',af:'cv',ts:pmsk(2026,7,4,1,0),venue:'Hard Rock Stadium, Майами'},
+  {id:'po_m87',round:'1/32 финала',home:'Колумбия',away:'Гана',hf:'co',af:'gh',ts:pmsk(2026,7,4,4,30),venue:'Arrowhead Stadium, Канзас-Сити'},
+  // ===== 1/16 финала =====
+  {id:'po_m90',round:'1/16 финала',home:'Победитель М73',away:'Победитель М75',hf:'tbd',af:'tbd',ts:pmsk(2026,7,4,20,0),venue:'NRG Stadium, Хьюстон'},
+  {id:'po_m89',round:'1/16 финала',home:'Победитель М74',away:'Победитель М77',hf:'tbd',af:'tbd',ts:pmsk(2026,7,5,0,0),venue:'Lincoln Financial Field, Филадельфия'},
+  {id:'po_m91',round:'1/16 финала',home:'Победитель М76',away:'Победитель М78',hf:'tbd',af:'tbd',ts:pmsk(2026,7,5,23,0),venue:'MetLife Stadium, Нью-Джерси'},
+  {id:'po_m92',round:'1/16 финала',home:'Победитель М79',away:'Победитель М80',hf:'tbd',af:'tbd',ts:pmsk(2026,7,6,3,0),venue:'Estadio Azteca, Мехико'},
+  {id:'po_m93',round:'1/16 финала',home:'Победитель М83',away:'Победитель М84',hf:'tbd',af:'tbd',ts:pmsk(2026,7,6,22,0),venue:'AT&T Stadium, Арлингтон'},
+  {id:'po_m94',round:'1/16 финала',home:'Победитель М81',away:'Победитель М82',hf:'tbd',af:'tbd',ts:pmsk(2026,7,7,3,0),venue:'Lumen Field, Сиэтл'},
+  {id:'po_m95',round:'1/16 финала',home:'Победитель М86',away:'Победитель М88',hf:'tbd',af:'tbd',ts:pmsk(2026,7,7,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
+  {id:'po_m96',round:'1/16 финала',home:'Победитель М85',away:'Победитель М87',hf:'tbd',af:'tbd',ts:pmsk(2026,7,7,23,0),venue:'BC Place, Ванкувер'},
+  // ===== Четвертьфиналы =====
+  {id:'po_qf1',round:'Четвертьфинал',home:'ТБД',away:'ТБД',hf:'tbd',af:'tbd',ts:pmsk(2026,7,9,22,0),venue:'ТБД'},
+  {id:'po_qf2',round:'Четвертьфинал',home:'ТБД',away:'ТБД',hf:'tbd',af:'tbd',ts:pmsk(2026,7,10,2,0),venue:'ТБД'},
+  {id:'po_qf3',round:'Четвертьфинал',home:'ТБД',away:'ТБД',hf:'tbd',af:'tbd',ts:pmsk(2026,7,10,22,0),venue:'ТБД'},
+  {id:'po_qf4',round:'Четвертьфинал',home:'ТБД',away:'ТБД',hf:'tbd',af:'tbd',ts:pmsk(2026,7,11,2,0),venue:'ТБД'},
+  // ===== Полуфиналы =====
+  {id:'po_sf1',round:'Полуфинал',home:'ТБД',away:'ТБД',hf:'tbd',af:'tbd',ts:pmsk(2026,7,14,22,0),venue:'AT&T Stadium, Арлингтон'},
+  {id:'po_sf2',round:'Полуфинал',home:'ТБД',away:'ТБД',hf:'tbd',af:'tbd',ts:pmsk(2026,7,15,22,0),venue:'Mercedes-Benz Stadium, Атланта'},
+  // ===== Матч за 3-е место =====
+  {id:'po_3p',round:'Матч за 3-е место',home:'ТБД',away:'ТБД',hf:'tbd',af:'tbd',ts:pmsk(2026,7,19,0,0),venue:'Hard Rock Stadium, Майами'},
+  // ===== Финал =====
+  {id:'po_final',round:'Финал',home:'ТБД',away:'ТБД',hf:'tbd',af:'tbd',ts:pmsk(2026,7,19,22,0),venue:'MetLife Stadium, Нью-Джерси'},
+].sort((a,b)=>a.ts-b.ts);
+
+// ====== PLAY-OFF: построение карточки матча ======
+function buildPlayoffMatchCard(m){
+  const f=fmtMSK(m.ts);
+  const st=getMatchStatus(m);
+  const preds=allPredictions[m.id]||[];
+  const myPred=currentUser?preds.find(p=>p.username===currentUser.username):null;
+  const result=allResults[m.id];
+  const homeFlagHtml = m.hf==='tbd'
+    ? `<div style="width:36px;height:24px;background:#1E3A5C;border-radius:3px;margin-bottom:2px;"></div>`
+    : `<img class="team-flag" src="https://flagcdn.com/w40/${m.hf}.png" onerror="this.style.display='none'" alt="${m.home}">`;
+  const awayFlagHtml = m.af==='tbd'
+    ? `<div style="width:36px;height:24px;background:#1E3A5C;border-radius:3px;margin-bottom:2px;margin-left:auto;"></div>`
+    : `<img class="team-flag" src="https://flagcdn.com/w40/${m.af}.png" onerror="this.style.display='none'" alt="${m.away}">`;
+  let bottom='';
+  if(!isOpen(m)||isFinished(m)){
+    const tags=preds.map(p=>{
+      const pts=result?calcPoints(p.home_score,p.away_score,result.home_score,result.away_score):null;
+      return `<span class="pred-tag">${p.username}: ${p.home_score}-${p.away_score}${pts!==null?` <span class="pts">(+${pts})</span>`:''}</span>`;
+    }).join('');
+    if(tags) bottom=`<div class="match-bottom"><div class="preds-list">${tags}</div></div>`;
+  } else if(myPred){
+    bottom=`<div class="match-bottom">Мой прогноз: <span class="my-pred">${myPred.home_score}-${myPred.away_score}</span></div>`;
+  }
+  const scoreStr=result
+    ?`<span class="result-score">${result.home_score}:${result.away_score}</span>`
+    :`<div class="match-time">${f.time}</div><div class="match-meta">GMT+3</div>`;
+  return `<div class="match-card${myPred?' has-pred':''}" onclick="showPage('playoffmatch','${m.id}')">
+    <div class="match-top">
+      <div class="team-block">${homeFlagHtml}<div class="team-name">${m.home}</div></div>
+      <div class="vs-block">${scoreStr}<span class="match-status ${st.cls}">${st.label}</span></div>
+      <div class="team-block right">${awayFlagHtml}<div class="team-name">${m.away}</div></div>
+    </div>${bottom}</div>`;
+}
+
+// ====== PLAY-OFF: рендер списка матчей ======
+function renderPlayoffMatches(){
+  const finished = PLAYOFF_MATCHES.filter(m=>isFinished(m));
+  const upcoming = PLAYOFF_MATCHES.filter(m=>!isFinished(m));
+  const rounds_order=['1/32 финала','1/16 финала','Четвертьфинал','Полуфинал','Матч за 3-е место','Финал'];
+  function buildRoundGroups(matches){
+    const byRound={};
+    matches.forEach(m=>{ if(!byRound[m.round])byRound[m.round]=[]; byRound[m.round].push(m); });
+    let html='';
+    rounds_order.forEach(r=>{
+      if(!byRound[r]) return;
+      html+=`<div class="day-header">🏆 ${r}</div>`;
+      byRound[r].forEach(m=>{ html+=buildPlayoffMatchCard(m); });
+    });
+    return html;
+  }
+  let html='';
+  if(finished.length>0){
+    html+=`<div class="finished-section">
+      <div class="finished-header" onclick="togglePlayoffFinished()">
+        <span>✅ Завершённые матчи (${finished.length})</span>
+        <span id="playoffFinishedArrow" style="transition:transform 0.2s;">▼</span>
+      </div>
+      <div id="playoffFinishedList" style="display:none;">${buildRoundGroups(finished)}</div>
+    </div>`;
+  }
+  html += buildRoundGroups(upcoming);
+  document.getElementById('playoffMatchList').innerHTML = html || '<div style="color:#6B8AA8;padding:20px;text-align:center;">Матчи play-off начнутся 28 июня 2026</div>';
+}
+
+function togglePlayoffFinished(){
+  const list=document.getElementById('playoffFinishedList');
+  const arrow=document.getElementById('playoffFinishedArrow');
+  if(list.style.display==='none'){ list.style.display='block'; arrow.style.transform='rotate(180deg)'; }
+  else { list.style.display='none'; arrow.style.transform='rotate(0deg)'; }
+}
+
+// ====== PLAY-OFF: страница матча ======
+let currentPlayoffMatchId = null;
+function renderPlayoffMatchDetail(){
+  const m=PLAYOFF_MATCHES.find(x=>x.id===currentPlayoffMatchId); if(!m)return;
+  const f=fmtMSK(m.ts);
+  const st=getMatchStatus(m);
+  const preds=allPredictions[m.id]||[];
+  const myPred=currentUser?preds.find(p=>p.username===currentUser.username):null;
+  const result=allResults[m.id];
+  const open=isOpen(m),finished=isFinished(m);
+  const homeFlagHtml = m.hf==='tbd' ? '' : `<img class="hero-flag" src="https://flagcdn.com/w80/${m.hf}.png" onerror="this.style.display='none'" alt="${m.home}">`;
+  const awayFlagHtml = m.af==='tbd' ? '' : `<img class="hero-flag" src="https://flagcdn.com/w80/${m.af}.png" onerror="this.style.display='none'" alt="${m.away}">`;
+  let predSection='';
+  if(open&&currentUser){
+    const h=myPred?myPred.home_score:'',a=myPred?myPred.away_score:'';
+    predSection=`<div class="predict-box"><div class="predict-title">Ваш прогноз</div>
+      <div class="score-input-row">
+        <div class="team-label">${homeFlagHtml}<br>${m.home}</div>
+        <input class="score-num" type="number" min="0" max="20" id="poph" value="${h}" placeholder="0">
+        <span class="score-dash">—</span>
+        <input class="score-num" type="number" min="0" max="20" id="popa" value="${a}" placeholder="0">
+        <div class="team-label">${awayFlagHtml}<br>${m.away}</div>
+      </div>
+      <button class="btn-login" onclick="savePlayoffPred('${m.id}')">СОХРАНИТЬ ПРОГНОЗ</button>
+      ${myPred?`<div style="text-align:center;margin-top:10px;font-size:12px;color:#6B8AA8;">Текущий: <span style="color:#F4A90A;font-weight:600">${myPred.home_score}–${myPred.away_score}</span></div>`:''}
+    </div>`;
+  } else if(!open&&!finished){
+    predSection=`<div class="predict-box"><div class="closed-msg">⏰ Приём прогнозов закрыт (менее 1 часа до матча)</div>
+      ${myPred?`<div style="text-align:center;color:#9BB3CC;font-size:13px;">Ваш прогноз: <span style="color:#F4A90A;font-weight:600">${myPred.home_score}–${myPred.away_score}</span></div>`:'<div style="text-align:center;color:#6B8AA8;font-size:13px;">Вы не сделали прогноз</div>'}
+    </div>`;
+  } else if(finished){
+    const myPts=myPred?calcPoints(myPred.home_score,myPred.away_score,result.home_score,result.away_score):null;
+    predSection=`<div class="predict-box">
+      <div style="text-align:center;margin-bottom:14px;">
+        <div style="font-size:11px;color:#6B8AA8;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Итоговый счёт</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:44px;color:#27b44b;letter-spacing:4px;">${result.home_score} : ${result.away_score}</div>
+      </div>
+      ${myPred?`<div style="text-align:center;padding:10px;background:#0D1B2A;border-radius:8px;">
+        <span style="font-size:13px;color:#9BB3CC;">Ваш прогноз: <strong style="color:#F4A90A;">${myPred.home_score}–${myPred.away_score}</strong></span>
+        <span style="margin-left:12px;font-size:13px;color:${myPts>0?'#27b44b':'#6B8AA8'};">
+          ${myPts===4?'🎯 Точный счёт':myPts===2?'✅ Разница голов':myPts===1?'👍 Верный исход':'❌ Мимо'}
+          <strong style="color:#F4A90A;"> +${myPts}</strong>
+        </span>
+      </div>`:'<div style="text-align:center;color:#6B8AA8;font-size:13px;">Прогноз не был сделан</div>'}
+    </div>`;
+  }
+  const predsHTML=(!open||finished)&&preds.length?`<div class="all-preds"><div class="preds-title">Прогнозы всех участников</div>${preds.map(p=>{
+    const pts=result?calcPoints(p.home_score,p.away_score,result.home_score,result.away_score):null;
+    return `<div class="pred-row"><span class="pred-user">👤 ${p.username}</span><span style="font-weight:500;">${p.home_score} — ${p.away_score}</span>${pts!==null?`<span class="pred-pts-badge">+${pts}</span>`:''}</div>`;
+  }).join('')}</div>`:'';
+  document.getElementById('matchDetail').innerHTML=`
+    <div class="match-hero">
+      <div class="hero-teams">
+        <div class="hero-team">${homeFlagHtml}<div class="hero-name">${m.home}</div></div>
+        ${finished?`<div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#27b44b;letter-spacing:4px;">${result.home_score} : ${result.away_score}</div>`:`<div class="hero-vs">VS</div>`}
+        <div class="hero-team">${awayFlagHtml}<div class="hero-name">${m.away}</div></div>
+      </div>
+      <div style="font-size:12px;color:#6B8AA8;margin-top:4px;">🏆 ${m.round} · 📅 ${f.date} · ⏰ ${f.time} GMT+3 · <span class="match-status ${st.cls}">${st.label}</span></div>
+    </div>
+    ${predSection}${predsHTML}`;
+}
+
+async function savePlayoffPred(mid){
+  const h=document.getElementById('poph').value, a=document.getElementById('popa').value;
+  if(h===''||a===''){showToast('Введите счёт',true);return;}
+  const {error}=await sb.from('predictions').upsert({user_id:currentUser.id,match_id:mid,home_score:+h,away_score:+a},{onConflict:'user_id,match_id'});
+  if(error){showToast('Ошибка: '+error.message,true);return;}
+  showToast('Прогноз сохранён ✓');
+  await loadData();
+  renderPlayoffMatchDetail();
+  renderPlayoffMatches();
+}
+
+// ====== PLAY-OFF ТАБЛИЦА ======
+function renderPlayoffLeaderboard(){
+  const playoffIds = new Set(PLAYOFF_MATCHES.map(m=>m.id));
+  const pts={}, counts={}, games={};
+  const finishedPlayoffIds = Object.keys(allResults).filter(mid=>playoffIds.has(mid));
+  finishedPlayoffIds.forEach(mid=>{
+    (allPredictions[mid]||[]).forEach(p=>{
+      if(!pts[p.username]){pts[p.username]=0;counts[p.username]={exact:0,diff:0,res:0};games[p.username]=0;}
+    });
+  });
+  finishedPlayoffIds.forEach(mid=>{
+    const r=allResults[mid];
+    (allPredictions[mid]||[]).forEach(p=>{
+      const pt=calcPoints(p.home_score,p.away_score,r.home_score,r.away_score);
+      pts[p.username]+=pt;
+      if(pt===4)counts[p.username].exact++;
+      else if(pt===2)counts[p.username].diff++;
+      else if(pt===1)counts[p.username].res++;
+    });
+  });
+  Object.keys(pts).forEach(u=>{
+    games[u]=finishedPlayoffIds.filter(mid=>(allPredictions[mid]||[]).some(p=>p.username===u)).length;
+  });
+  const lb=Object.keys(pts).map(u=>({user:u,pts:pts[u],counts:counts[u],games:games[u]}))
+    .sort((a,b)=>b.pts-a.pts||b.counts.exact-a.counts.exact);
+  const el=document.getElementById('lbPlayoffContent');
+  if(!lb.length){
+    el.innerHTML=`<div class="lb-empty"><div style="font-size:32px;margin-bottom:10px;">📋</div><div>Таблица пустая — очки появятся после завершённых матчей play-off</div></div>
+    <div class="lb-legend"><strong style="color:#E8EDF2;">Система начисления очков:</strong><br>
+    🎯 Точный счёт — <span style="color:#F4A90A;">+4 очка</span><br>
+    ✅ Разница голов — <span style="color:#F4A90A;">+2 очка</span><br>
+    👍 Исход (победа / ничья) — <span style="color:#F4A90A;">+1 очко</span></div>`;
+    return;
+  }
+  const medals=['🥇','🥈','🥉'];
+  const rows=lb.map((e,i)=>`<tr>
+    <td><span class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</span></td>
+    <td><div class="lb-name">${medals[i]||''}${e.user}</div>
+    <div class="lb-sub">🎯 ${e.counts.exact} &nbsp;✅ ${e.counts.diff} &nbsp;👍 ${e.counts.res} &nbsp;· матчей: ${e.games}</div></td>
+    <td class="lb-pts-cell"><div class="lb-pts">${e.pts}</div><span class="lb-pts-label">очков</span></td>
+  </tr>`).join('');
+  el.innerHTML=`<table class="lb-table">
+    <thead><tr><th style="width:36px;">#</th><th>Участник</th><th class="right">Очки</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="lb-legend">🎯 точный счёт (+4) &nbsp;&nbsp; ✅ разница голов (+2) &nbsp;&nbsp; 👍 исход матча (+1)</div>`;
+}
+
+function toggleGroupLB(){
+  const list=document.getElementById('groupLBContent');
+  const arrow=document.getElementById('groupLBArrow');
+  if(list.style.display==='none'){ list.style.display='block'; arrow.style.transform='rotate(180deg)'; }
+  else { list.style.display='none'; arrow.style.transform='rotate(0deg)'; }
+}
+
+// ====== ОБНОВЛЯЕМ renderLeaderboard чтобы также рендерить play-off ======
+const _origRenderLeaderboard = renderLeaderboard;
+renderLeaderboard = function(){
+  _origRenderLeaderboard();
+  renderPlayoffLeaderboard();
+};
+
+// ====== ОБНОВЛЯЕМ showPage для playoffmatch ======
+const _origShowPage = showPage;
+showPage = function(id, matchId){
+  if(id==='playoffmatch'){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-match').classList.add('active');
+    if(matchId) currentPlayoffMatchId=matchId;
+    renderPlayoffMatchDetail();
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active-tab'));
+    const el=document.getElementById('tabPlayoff'); if(el)el.classList.add('active-tab');
+    return;
+  }
+  _origShowPage(id, matchId);
+};
+
+// Добавляем play-off матчи в renderAdmin
+const _origRenderAdmin = renderAdmin;
+renderAdmin = function(){
+  _origRenderAdmin();
+  // Добавляем секцию play-off в конец admin
+  const adminList = document.getElementById('adminList');
+  const poHeader = document.createElement('div');
+  poHeader.innerHTML = '<div class="section-title" style="margin-top:20px;font-size:18px;">⚽ Play-off матчи</div>';
+  adminList.appendChild(poHeader);
+  PLAYOFF_MATCHES.forEach(m=>{
+    const f=fmtMSK(m.ts); const r=allResults[m.id];
+    const div = document.createElement('div');
+    div.className = 'admin-match';
+    div.innerHTML = `<div class="admin-match-name">${m.home} — ${m.away}
+        <span style="font-size:11px;color:#6B8AA8;margin-left:6px;">${m.round} · ${f.date} ${f.time} GMT+3</span>
+      </div>
+      <div class="admin-row">
+        <input class="admin-score-in" type="number" min="0" max="20" id="rh_${m.id}" value="${r?r.home_score:''}" placeholder="Д">
+        <span style="color:#6B8AA8;font-size:18px;font-weight:bold;">:</span>
+        <input class="admin-score-in" type="number" min="0" max="20" id="ra_${m.id}" value="${r?r.away_score:''}" placeholder="Г">
+        <button class="btn-small" onclick="saveResult('${m.id}')">Сохранить</button>
+        ${r?`<button class="btn-small danger" onclick="delResult('${m.id}')">Удалить</button><span style="font-size:12px;color:#27b44b;margin-left:4px;">✓ ${r.home_score}:${r.away_score}</span>`:''}
+      </div>`;
+    adminList.appendChild(div);
+  });
+};
+
 </script>
 </body>
 </html>
