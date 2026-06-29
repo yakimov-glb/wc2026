@@ -360,8 +360,8 @@ function renderNav(){
   } else {
     const isAdmin = currentUser.is_admin;
     nr.innerHTML=`<span class="nav-user">👤 <strong>${currentUser.username}</strong></span>
-      <button class="nav-btn" id="tabMatches" onclick="showPage('matches')">Матчи гр. этап</button>
       <button class="nav-btn" id="tabPlayoff" onclick="showPage('playoff')">Матчи play-off</button>
+      <button class="nav-btn" id="tabMatches" onclick="showPage('matches')">Матчи гр. этап</button>
       <button class="nav-btn" id="tabLB" onclick="showPage('leaderboard')">Таблица</button>
       ${isAdmin?'<button class="nav-btn" id="tabAdmin" onclick="showPage(\'admin\')">Ред.</button>':''}
       <button class="nav-btn" onclick="doLogout()">Выйти</button>`;
@@ -382,7 +382,7 @@ async function doLogin(){
   sessionStorage.setItem('wc2026_user', JSON.stringify(data));
   renderNav();
   await loadData();
-  showPage('matches');
+  showPage('playoff');
 }
 
 async function doRegister(){
@@ -403,7 +403,7 @@ async function doRegister(){
   sessionStorage.setItem('wc2026_user', JSON.stringify(data));
   renderNav();
   await loadData();
-  showPage('matches');
+  showPage('playoff');
 }
 
 function doLogout(){
@@ -687,7 +687,7 @@ async function delResult(mid){
     currentUser = JSON.parse(saved);
     renderNav();
     await loadData();
-    showPage('matches');
+    showPage('playoff');
   }
 })();
 
