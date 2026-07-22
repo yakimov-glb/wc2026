@@ -39,9 +39,9 @@ body{font-family:'Inter',sans-serif;background:#0D1B2A;min-height:100vh;color:#E
 .match-card:hover{border-color:#2E5A8C}
 .match-card.has-pred{border-left:3px solid #F4A90A}
 .match-top{display:flex;align-items:center;padding:10px 12px;gap:8px}
-.team-block{flex:1}.team-block.right{text-align:right}.team-block.right .team-flag{margin-left:auto}
+.team-block{flex:1;display:flex;flex-direction:column;align-items:flex-start}.team-block.right{text-align:right;align-items:flex-end}.team-logo{width:38px;height:38px;object-fit:contain;margin-bottom:4px}.team-block.right .team-flag{margin-left:auto}
 .team-name{font-size:13px;font-weight:500;line-height:1.3}
-.team-badge{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;font-size:8px;font-weight:700;color:#fff;font-family:'Inter',sans-serif;letter-spacing:0;flex-shrink:0;margin-bottom:2px;}.team-badge.dk{color:#111}
+
 .finished-section{margin-bottom:8px}
 .finished-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#162032;border:1px solid #1E3A5C;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:#9BB3CC;transition:all 0.15s;margin-bottom:4px}
 .finished-header:hover{border-color:#2E5A8C;color:#E8EDF2}
@@ -239,9 +239,11 @@ function showToast(msg,isErr=false){
   setTimeout(()=>t.style.display='none',3000);
 }
 
-function teamBadge(abbr, color){
-  const dark = ['#F5C518','#FF8C00','#FFD700'].includes(color);
-  return `<div class="team-badge${dark?' dk':''}" style="background:${color}">${abbr}</div>`;
+const TEAM_IDS={'ЦСКА':2325,'Балтика':7517,'Динамо':2315,'Крылья Советов':2322,'Акрон':285689,'Зенит':2321,'Факел':2317,'Динамо Мх':362016,'Спартак':2323,'Родина':322699,'Оренбург':24118,'Ростов':2326,'Локомотив':2320,'Ахмат':5131,'Рубин':2333,'Краснодар':34425};
+function teamLogo(name){
+  const id=TEAM_IDS[name];
+  if(!id) return `<div style="width:38px;height:38px;background:#1E3A5C;border-radius:50%;"></div>`;
+  return `<img class="team-logo" src="https://img.sofascore.com/api/v1/team/${id}/image" alt="${name}" onerror="this.style.display='none'">`;
 }
 
 // ====== ЗАГРУЗКА ======
@@ -360,9 +362,9 @@ function buildRPLCard(m){
     :`<div class="match-time">${f.time}</div><div class="match-meta">GMT+3</div>`;
   return `<div class="match-card${myPred?' has-pred':''}" onclick="showPage('match','${m.id}')">
     <div class="match-top">
-      <div class="team-block">${teamBadge(m.ha,m.hc)}<div class="team-name">${m.home}</div></div>
+      <div class="team-block">${teamLogo(m.home)}<div class="team-name">${m.home}</div></div>
       <div class="vs-block">${scoreStr}<span class="match-status ${st.cls}">${st.label}</span></div>
-      <div class="team-block right">${teamBadge(m.aa,m.ac)}<div class="team-name">${m.away}</div></div>
+      <div class="team-block right">${teamLogo(m.away)}<div class="team-name">${m.away}</div></div>
     </div>${bottom}</div>`;
 }
 
@@ -423,11 +425,11 @@ function renderMatchDetail(){
     const h=myPred?myPred.home_score:'',a=myPred?myPred.away_score:'';
     predSection=`<div class="predict-box"><div class="predict-title">Ваш прогноз</div>
       <div class="score-input-row">
-        <div class="team-label" style="display:flex;flex-direction:column;align-items:center;">${teamBadge(m.ha,m.hc)}<span style="margin-top:4px;">${m.home}</span></div>
+        <div class="team-label" style="display:flex;flex-direction:column;align-items:center;">${teamLogo(m.home)}<span style="margin-top:4px;">${m.home}</span></div>
         <input class="score-num" type="number" min="0" max="20" id="ph" value="${h}" placeholder="0">
         <span class="score-dash">—</span>
         <input class="score-num" type="number" min="0" max="20" id="pa" value="${a}" placeholder="0">
-        <div class="team-label" style="display:flex;flex-direction:column;align-items:center;">${teamBadge(m.aa,m.ac)}<span style="margin-top:4px;">${m.away}</span></div>
+        <div class="team-label" style="display:flex;flex-direction:column;align-items:center;">${teamLogo(m.away)}<span style="margin-top:4px;">${m.away}</span></div>
       </div>
       <button class="btn-login" onclick="savePred('${m.id}')">СОХРАНИТЬ ПРОГНОЗ</button>
       ${myPred?`<div style="text-align:center;margin-top:10px;font-size:12px;color:#6B8AA8;">Текущий: <span style="color:#F4A90A;font-weight:600">${myPred.home_score}–${myPred.away_score}</span></div>`:''}
@@ -460,12 +462,12 @@ function renderMatchDetail(){
     <div class="match-hero">
       <div class="hero-teams">
         <div class="hero-team">
-          <div style="display:flex;justify-content:center;margin-bottom:6px;">${teamBadge(m.ha,m.hc).replace('width:38px;height:38px','width:56px;height:56px;font-size:12px')}</div>
+          <div style="display:flex;justify-content:center;margin-bottom:6px;">${teamLogo(m.home).replace('class="team-logo"','class="team-logo" style="width:56px;height:56px;"')}</div>
           <div class="hero-name">${m.home}</div>
         </div>
         ${finished?`<div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#27b44b;letter-spacing:4px;">${result.home_score} : ${result.away_score}</div>`:`<div class="hero-vs">VS</div>`}
         <div class="hero-team">
-          <div style="display:flex;justify-content:center;margin-bottom:6px;">${teamBadge(m.aa,m.ac).replace('width:38px;height:38px','width:56px;height:56px;font-size:12px')}</div>
+          <div style="display:flex;justify-content:center;margin-bottom:6px;">${teamLogo(m.away).replace('class="team-logo"','class="team-logo" style="width:56px;height:56px;"')}</div>
           <div class="hero-name">${m.away}</div>
         </div>
       </div>
