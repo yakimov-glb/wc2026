@@ -41,7 +41,7 @@ body{font-family:'Inter',sans-serif;background:#0D1B2A;min-height:100vh;color:#E
 .match-top{display:flex;align-items:center;padding:10px 12px;gap:8px}
 .team-block{flex:1}.team-block.right{text-align:right}.team-block.right .team-flag{margin-left:auto}
 .team-name{font-size:13px;font-weight:500;line-height:1.3}
-.team-flag{display:block;width:36px;height:24px;object-fit:cover;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.team-badge{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;font-size:8px;font-weight:700;color:#fff;font-family:'Inter',sans-serif;letter-spacing:0;flex-shrink:0;margin-bottom:2px;}.team-badge.dk{color:#111}
 .finished-section{margin-bottom:8px}
 .finished-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#162032;border:1px solid #1E3A5C;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:#9BB3CC;transition:all 0.15s;margin-bottom:4px}
 .finished-header:hover{border-color:#2E5A8C;color:#E8EDF2}
@@ -152,10 +152,10 @@ body{font-family:'Inter',sans-serif;background:#0D1B2A;min-height:100vh;color:#E
   </div></div>
 </div>
 
-<div id="page-matches" class="page">
+<div id="page-rpl1" class="page">
   <div class="main-wrap">
-    <div class="section-title">⚽ Матчи ЧМ 2026 — групповой этап</div>
-    <div id="matchList"><div class="loading"><span class="spinner"></span>Загрузка...</div></div>
+    <div class="section-title">⚽ Чемпионат России — тур №1</div>
+    <div id="rpl1List"><div class="loading"><span class="spinner"></span>Загрузка...</div></div>
   </div>
 </div>
 
@@ -166,28 +166,10 @@ body{font-family:'Inter',sans-serif;background:#0D1B2A;min-height:100vh;color:#E
   </div>
 </div>
 
-<div id="page-playoff" class="page">
-  <div class="main-wrap">
-    <div class="section-title">⚽ Матчи ЧМ 2026 — play-off</div>
-    <div id="playoffMatchList"><div class="loading"><span class="spinner"></span>Загрузка...</div></div>
-  </div>
-</div>
-
 <div id="page-leaderboard" class="page">
   <div class="lb-wrap">
-    <!-- Групповой этап — свёрнут -->
-    <div class="finished-section" style="margin-bottom:16px;">
-      <div class="finished-header" onclick="toggleGroupLB()" id="groupLBHeader">
-        <span>📊 Таблица участников — групповой этап</span>
-        <span id="groupLBArrow" style="transition:transform 0.2s;">▼</span>
-      </div>
-      <div id="groupLBContent" style="display:none;">
-        <div id="lbContent"><div class="loading"><span class="spinner"></span>Загрузка...</div></div>
-      </div>
-    </div>
-    <!-- Play-off — всегда видна -->
-    <div class="section-title">🏆 Таблица участников — play-off</div>
-    <div id="lbPlayoffContent"><div class="loading"><span class="spinner"></span>Загрузка...</div></div>
+    <div class="section-title">🏆 Таблица ЧР тур 1</div>
+    <div id="lbContent"><div class="loading"><span class="spinner"></span>Загрузка...</div></div>
   </div>
 </div>
 
@@ -204,88 +186,27 @@ const SUPABASE_URL = 'https://yhltyfilfcjaxwcqcxsu.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlobHR5ZmlsZmNqYXh3Y3FjeHN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzAwMjEsImV4cCI6MjA5NjcwNjAyMX0.8oA09lwE3TCg06DVaeyZflxwRdIihB0Tk1Wij9tiRfI';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ====== МАТЧИ ======
-function msk(y,mo,d,h,m){return Date.UTC(y,mo-1,d,h-3,m||0)}
-const MATCHES=[
-  {id:'t1m01',g:'A',home:'Мексика',away:'ЮАР',hf:'mx',af:'za',ts:msk(2026,6,11,22,0),venue:'Estadio Azteca, Мехико'},
-  {id:'t1m02',g:'A',home:'Южная Корея',away:'Чехия',hf:'kr',af:'cz',ts:msk(2026,6,12,5,0),venue:'Estadio Akron, Гвадалахара'},
-  {id:'t1m03',g:'B',home:'Канада',away:'Босния и Герц.',hf:'ca',af:'ba',ts:msk(2026,6,12,22,0),venue:'BMO Field, Торонто'},
-  {id:'t1m04',g:'D',home:'США',away:'Парагвай',hf:'us',af:'py',ts:msk(2026,6,13,4,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'t1m05',g:'B',home:'Катар',away:'Швейцария',hf:'qa',af:'ch',ts:msk(2026,6,13,22,0),venue:"Levi's Stadium, Санта-Клара"},
-  {id:'t1m06',g:'C',home:'Бразилия',away:'Марокко',hf:'br',af:'ma',ts:msk(2026,6,14,1,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'t1m07',g:'C',home:'Гаити',away:'Шотландия',hf:'ht',af:'gb-sct',ts:msk(2026,6,14,4,0),venue:'Gillette Stadium, Бостон'},
-  {id:'t1m08',g:'D',home:'Австралия',away:'Турция',hf:'au',af:'tr',ts:msk(2026,6,14,7,0),venue:'BC Place, Ванкувер'},
-  {id:'t1m09',g:'E',home:'Германия',away:'Кюрасао',hf:'de',af:'cw',ts:msk(2026,6,14,20,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'t1m10',g:'F',home:'Нидерланды',away:'Япония',hf:'nl',af:'jp',ts:msk(2026,6,14,23,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'t1m11',g:'E',home:'Кот-д\'Ивуар',away:'Эквадор',hf:'ci',af:'ec',ts:msk(2026,6,15,2,0),venue:'Lincoln Financial Field, Филадельфия'},
-  {id:'t1m12',g:'F',home:'Швеция',away:'Тунис',hf:'se',af:'tn',ts:msk(2026,6,15,5,0),venue:'Estadio BBVA, Монтеррей'},
-  {id:'t1m13',g:'H',home:'Испания',away:'Кабо-Верде',hf:'es',af:'cv',ts:msk(2026,6,15,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'t1m14',g:'G',home:'Бельгия',away:'Египет',hf:'be',af:'eg',ts:msk(2026,6,15,22,0),venue:'Lumen Field, Сиэтл'},
-  {id:'t1m15',g:'H',home:'Саудовская Аравия',away:'Уругвай',hf:'sa',af:'uy',ts:msk(2026,6,16,1,0),venue:'Hard Rock Stadium, Майами'},
-  {id:'t1m16',g:'G',home:'Иран',away:'Новая Зеландия',hf:'ir',af:'nz',ts:msk(2026,6,16,4,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'t1m17',g:'I',home:'Франция',away:'Сенегал',hf:'fr',af:'sn',ts:msk(2026,6,16,22,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'t1m18',g:'I',home:'Ирак',away:'Норвегия',hf:'iq',af:'no',ts:msk(2026,6,17,1,0),venue:'Gillette Stadium, Бостон'},
-  {id:'t1m19',g:'J',home:'Аргентина',away:'Алжир',hf:'ar',af:'dz',ts:msk(2026,6,17,4,0),venue:'Arrowhead Stadium, Канзас-Сити'},
-  {id:'t1m20',g:'J',home:'Австрия',away:'Иордания',hf:'at',af:'jo',ts:msk(2026,6,17,7,0),venue:"Levi's Stadium, Санта-Клара"},
-  {id:'t1m21',g:'K',home:'Португалия',away:'ДР Конго',hf:'pt',af:'cd',ts:msk(2026,6,17,20,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'t1m22',g:'L',home:'Англия',away:'Хорватия',hf:'gb-eng',af:'hr',ts:msk(2026,6,17,23,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'t1m23',g:'L',home:'Гана',away:'Панама',hf:'gh',af:'pa',ts:msk(2026,6,18,2,0),venue:'BMO Field, Торонто'},
-  {id:'t1m24',g:'K',home:'Узбекистан',away:'Колумбия',hf:'uz',af:'co',ts:msk(2026,6,18,5,0),venue:'Estadio Azteca, Мехико'},
-  {id:'t2m01',g:'A',home:'Чехия',away:'ЮАР',hf:'cz',af:'za',ts:msk(2026,6,18,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'t2m02',g:'B',home:'Швейцария',away:'Босния и Герц.',hf:'ch',af:'ba',ts:msk(2026,6,18,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'t2m03',g:'B',home:'Канада',away:'Катар',hf:'ca',af:'qa',ts:msk(2026,6,19,1,0),venue:'BC Place, Ванкувер'},
-  {id:'t2m04',g:'A',home:'Мексика',away:'Южная Корея',hf:'mx',af:'kr',ts:msk(2026,6,19,6,0),venue:'Estadio Akron, Гвадалахара'},
-  {id:'t2m05',g:'D',home:'США',away:'Австралия',hf:'us',af:'au',ts:msk(2026,6,19,22,0),venue:'Lumen Field, Сиэтл'},
-  {id:'t2m06',g:'C',home:'Шотландия',away:'Марокко',hf:'gb-sct',af:'ma',ts:msk(2026,6,20,1,0),venue:'Gillette Stadium, Бостон'},
-  {id:'t2m07',g:'C',home:'Бразилия',away:'Гаити',hf:'br',af:'ht',ts:msk(2026,6,20,4,0),venue:'Lincoln Financial Field, Филадельфия'},
-  {id:'t2m08',g:'D',home:'Турция',away:'Парагвай',hf:'tr',af:'py',ts:msk(2026,6,20,6,0),venue:"Levi's Stadium, Санта-Клара"},
-  {id:'t2m09',g:'F',home:'Нидерланды',away:'Швеция',hf:'nl',af:'se',ts:msk(2026,6,20,20,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'t2m10',g:'E',home:'Германия',away:'Кот-д\'Ивуар',hf:'de',af:'ci',ts:msk(2026,6,20,23,0),venue:'BMO Field, Торонто'},
-  {id:'t2m11',g:'E',home:'Эквадор',away:'Кюрасао',hf:'ec',af:'cw',ts:msk(2026,6,21,3,0),venue:'Arrowhead Stadium, Канзас-Сити'},
-  {id:'t2m12',g:'F',home:'Тунис',away:'Япония',hf:'tn',af:'jp',ts:msk(2026,6,21,7,0),venue:'Estadio BBVA, Монтеррей'},
-  {id:'t2m13',g:'H',home:'Испания',away:'Саудовская Аравия',hf:'es',af:'sa',ts:msk(2026,6,21,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'t2m14',g:'G',home:'Бельгия',away:'Иран',hf:'be',af:'ir',ts:msk(2026,6,21,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'t2m15',g:'H',home:'Уругвай',away:'Кабо-Верде',hf:'uy',af:'cv',ts:msk(2026,6,22,1,0),venue:'Hard Rock Stadium, Майами'},
-  {id:'t2m16',g:'G',home:'Новая Зеландия',away:'Египет',hf:'nz',af:'eg',ts:msk(2026,6,22,4,0),venue:'BC Place, Ванкувер'},
-  {id:'t2m17',g:'J',home:'Аргентина',away:'Австрия',hf:'ar',af:'at',ts:msk(2026,6,22,20,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'t2m18',g:'I',home:'Франция',away:'Ирак',hf:'fr',af:'iq',ts:msk(2026,6,23,0,0),venue:'Lincoln Financial Field, Филадельфия'},
-  {id:'t2m19',g:'I',home:'Норвегия',away:'Сенегал',hf:'no',af:'sn',ts:msk(2026,6,23,3,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'t2m20',g:'J',home:'Иордания',away:'Алжир',hf:'jo',af:'dz',ts:msk(2026,6,23,6,0),venue:"Levi's Stadium, Санта-Клара"},
-  {id:'t2m21',g:'K',home:'Португалия',away:'Узбекистан',hf:'pt',af:'uz',ts:msk(2026,6,23,20,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'t2m22',g:'L',home:'Англия',away:'Гана',hf:'gb-eng',af:'gh',ts:msk(2026,6,23,23,0),venue:'Gillette Stadium, Бостон'},
-  {id:'t2m23',g:'L',home:'Панама',away:'Хорватия',hf:'pa',af:'hr',ts:msk(2026,6,24,2,0),venue:'BMO Field, Торонто'},
-  {id:'t2m24',g:'K',home:'Колумбия',away:'ДР Конго',hf:'co',af:'cd',ts:msk(2026,6,24,5,0),venue:'Estadio Akron, Гвадалахара'},
-  {id:'t3m01',g:'B',home:'Швейцария',away:'Канада',hf:'ch',af:'ca',ts:msk(2026,6,24,22,0),venue:'BC Place, Ванкувер'},
-  {id:'t3m02',g:'B',home:'Босния',away:'Катар',hf:'ba',af:'qa',ts:msk(2026,6,24,22,0),venue:'Lumen Field, Сиэтл'},
-  {id:'t3m03',g:'C',home:'Шотландия',away:'Бразилия',hf:'gb-sct',af:'br',ts:msk(2026,6,25,1,0),venue:'Hard Rock Stadium, Майами'},
-  {id:'t3m04',g:'C',home:'Марокко',away:'Гаити',hf:'ma',af:'ht',ts:msk(2026,6,25,1,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'t3m05',g:'A',home:'Чехия',away:'Мексика',hf:'cz',af:'mx',ts:msk(2026,6,25,4,0),venue:'Estadio Azteca, Мехико'},
-  {id:'t3m06',g:'A',home:'ЮАР',away:'Южная Корея',hf:'za',af:'kr',ts:msk(2026,6,25,4,0),venue:'Estadio BBVA, Монтеррей'},
-  {id:'t3m07',g:'E',home:'Эквадор',away:'Германия',hf:'ec',af:'de',ts:msk(2026,6,25,23,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'t3m08',g:'E',home:'Кюрасао',away:'Кот-д\'Ивуар',hf:'cw',af:'ci',ts:msk(2026,6,25,23,0),venue:'Lincoln Financial Field, Филадельфия'},
-  {id:'t3m09',g:'F',home:'Япония',away:'Швеция',hf:'jp',af:'se',ts:msk(2026,6,26,2,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'t3m10',g:'F',home:'Тунис',away:'Нидерланды',hf:'tn',af:'nl',ts:msk(2026,6,26,2,0),venue:'Arrowhead Stadium, Канзас-Сити'},
-  {id:'t3m11',g:'D',home:'Турция',away:'США',hf:'tr',af:'us',ts:msk(2026,6,26,5,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'t3m12',g:'D',home:'Парагвай',away:'Австралия',hf:'py',af:'au',ts:msk(2026,6,26,5,0),venue:"Levi's Stadium, Санта-Клара"},
-  {id:'t3m13',g:'I',home:'Норвегия',away:'Франция',hf:'no',af:'fr',ts:msk(2026,6,26,22,0),venue:'Gillette Stadium, Бостон'},
-  {id:'t3m14',g:'I',home:'Сенегал',away:'Ирак',hf:'sn',af:'iq',ts:msk(2026,6,26,22,0),venue:'BMO Field, Торонто'},
-  {id:'t3m15',g:'H',home:'Уругвай',away:'Испания',hf:'uy',af:'es',ts:msk(2026,6,27,3,0),venue:'Estadio Akron, Гвадалахара'},
-  {id:'t3m16',g:'H',home:'Кабо-Верде',away:'Саудовская Аравия',hf:'cv',af:'sa',ts:msk(2026,6,27,3,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'t3m17',g:'G',home:'Новая Зеландия',away:'Бельгия',hf:'nz',af:'be',ts:msk(2026,6,27,6,0),venue:'BC Place, Ванкувер'},
-  {id:'t3m18',g:'G',home:'Египет',away:'Иран',hf:'eg',af:'ir',ts:msk(2026,6,27,6,0),venue:'Lumen Field, Сиэтл'},
-  {id:'t3m19',g:'L',home:'Панама',away:'Англия',hf:'pa',af:'gb-eng',ts:msk(2026,6,28,0,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'t3m20',g:'L',home:'Хорватия',away:'Гана',hf:'hr',af:'gh',ts:msk(2026,6,28,0,0),venue:'Lincoln Financial Field, Филадельфия'},
-  {id:'t3m21',g:'K',home:'Колумбия',away:'Португалия',hf:'co',af:'pt',ts:msk(2026,6,28,2,30),venue:'Hard Rock Stadium, Майами'},
-  {id:'t3m22',g:'K',home:'ДР Конго',away:'Узбекистан',hf:'cd',af:'uz',ts:msk(2026,6,28,2,30),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'t3m23',g:'J',home:'Алжир',away:'Австрия',hf:'dz',af:'at',ts:msk(2026,6,28,5,0),venue:'Arrowhead Stadium, Канзас-Сити'},
-  {id:'t3m24',g:'J',home:'Иордания',away:'Аргентина',hf:'jo',af:'ar',ts:msk(2026,6,28,5,0),venue:'AT&T Stadium, Арлингтон'},
+// ====== РПЛ 2026/2027 — 1 ТУР ======
+// Все времена МСК (GMT+3), ts = UTC
+function toUTC(y,mo,d,h,m){ return Date.UTC(y,mo-1,d,h-3,m||0); }
+
+const RPL_MATCHES = [
+  {id:'rpl1_1', home:'ЦСКА',          away:'Балтика',          hc:'#E30613', ha:'ЦСК', ac:'#003F7F', aa:'БЛТ', ts:toUTC(2026,7,24,20,0),  venue:'ВЭБ.РФ Арена, Москва'},
+  {id:'rpl1_2', home:'Динамо',         away:'Крылья Советов',   hc:'#005CA9', ha:'ДИН', ac:'#013A81', aa:'КСВ', ts:toUTC(2026,7,25,14,0),  venue:'ВТБ Арена, Москва'},
+  {id:'rpl1_3', home:'Акрон',          away:'Зенит',            hc:'#CC0000', ha:'АКР', ac:'#009CDE', aa:'ЗЕН', ts:toUTC(2026,7,25,16,15), venue:'Самара Арена, Самара'},
+  {id:'rpl1_4', home:'Факел',          away:'Динамо Мх',        hc:'#E55A00', ha:'ФКЛ', ac:'#1A4B8C', aa:'ДМХ', ts:toUTC(2026,7,25,18,30), venue:'Центральный стадион, Воронеж'},
+  {id:'rpl1_5', home:'Спартак',        away:'Родина',           hc:'#E20613', ha:'СПА', ac:'#2D7336', aa:'РОД', ts:toUTC(2026,7,25,20,45), venue:'Открытие Арена, Москва'},
+  {id:'rpl1_6', home:'Оренбург',       away:'Ростов',           hc:'#FF8C00', ha:'ОРЕ', ac:'#1C3F8C', aa:'РОС', ts:toUTC(2026,7,26,14,30), venue:'Газпром Арена, Оренбург'},
+  {id:'rpl1_7', home:'Локомотив',      away:'Ахмат',            hc:'#00843D', ha:'ЛОК', ac:'#2D6A3F', aa:'АХМ', ts:toUTC(2026,7,26,17,0),  venue:'РЖД Арена, Москва'},
+  {id:'rpl1_8', home:'Рубин',          away:'Краснодар',        hc:'#A50034', ha:'РУБ', ac:'#F5C518', aa:'КРД', ts:toUTC(2026,7,26,19,30), venue:'Ак Барс Арена, Казань'},
 ].sort((a,b)=>a.ts-b.ts);
 
 // ====== СОСТОЯНИЕ ======
-let currentUser = null; // {id, username, is_admin}
+let currentUser = null;
 let currentMatchId = null;
-let allPredictions = {}; // match_id -> [{username, home_score, away_score}]
-let allResults = {};     // match_id -> {home_score, away_score}
+let matchContext = 'rpl1';
+let allPredictions = {};
+let allResults = {};
 
 // ====== УТИЛИТЫ ======
 function fmtMSK(ts){
@@ -310,7 +231,7 @@ function calcPoints(ph,pa,rh,ra){
   return 0;
 }
 
-function showToast(msg, isErr=false){
+function showToast(msg,isErr=false){
   const t=document.getElementById('toast');
   t.textContent=msg;
   t.className='toast'+(isErr?' err-toast':'');
@@ -318,23 +239,26 @@ function showToast(msg, isErr=false){
   setTimeout(()=>t.style.display='none',3000);
 }
 
-// ====== ЗАГРУЗКА ДАННЫХ ======
+function teamBadge(abbr, color){
+  const dark = ['#F5C518','#FF8C00','#FFD700'].includes(color);
+  return `<div class="team-badge${dark?' dk':''}" style="background:${color}">${abbr}</div>`;
+}
+
+// ====== ЗАГРУЗКА ======
 async function loadData(){
   const [predsRes, resRes] = await Promise.all([
     sb.from('predictions').select('match_id,home_score,away_score,users(username)'),
     sb.from('results').select('*')
   ]);
-  allPredictions = {};
+  allPredictions={};
   if(predsRes.data){
     predsRes.data.forEach(p=>{
-      if(!allPredictions[p.match_id]) allPredictions[p.match_id]=[];
+      if(!allPredictions[p.match_id])allPredictions[p.match_id]=[];
       allPredictions[p.match_id].push({username:p.users.username,home_score:p.home_score,away_score:p.away_score});
     });
   }
-  allResults = {};
-  if(resRes.data){
-    resRes.data.forEach(r=>{ allResults[r.match_id]={home_score:r.home_score,away_score:r.away_score}; });
-  }
+  allResults={};
+  if(resRes.data) resRes.data.forEach(r=>{allResults[r.match_id]={home_score:r.home_score,away_score:r.away_score};});
 }
 
 // ====== НАВИГАЦИЯ ======
@@ -342,14 +266,12 @@ function showPage(id, matchId){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   if(matchId) currentMatchId=matchId;
-  if(id==='matches') renderMatches();
-  if(id==='match'){matchContext='matches'; renderMatchDetail();}
-  if(id==='playoff') renderPlayoffMatches();
-  if(id==='playoffmatch') renderPlayoffMatchDetail();
+  if(id==='rpl1') renderRPL();
+  if(id==='match') renderMatchDetail();
   if(id==='leaderboard') renderLeaderboard();
   if(id==='admin') renderAdmin();
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active-tab'));
-  const map={matches:'tabMatches',playoff:'tabPlayoff',leaderboard:'tabLB',admin:'tabAdmin'};
+  const map={rpl1:'tabRPL1',leaderboard:'tabLB',admin:'tabAdmin'};
   if(map[id]){const el=document.getElementById(map[id]);if(el)el.classList.add('active-tab');}
 }
 
@@ -358,71 +280,66 @@ function renderNav(){
   if(!currentUser){
     nr.innerHTML=`<button class="nav-btn" onclick="showPage('login')">Войти</button><button class="nav-btn" onclick="showPage('register')">Регистрация</button>`;
   } else {
-    const isAdmin = currentUser.is_admin;
+    const isAdmin=currentUser.is_admin;
     nr.innerHTML=`<span class="nav-user">👤 <strong>${currentUser.username}</strong></span>
-      <button class="nav-btn" id="tabPlayoff" onclick="showPage('playoff')">Матчи play-off</button>
-      <button class="nav-btn" id="tabMatches" onclick="showPage('matches')">Матчи гр. этап</button>
+      <button class="nav-btn" id="tabRPL1" onclick="showPage('rpl1')">ЧР тур 1</button>
       <button class="nav-btn" id="tabLB" onclick="showPage('leaderboard')">Таблица</button>
       ${isAdmin?'<button class="nav-btn" id="tabAdmin" onclick="showPage(\'admin\')">Ред.</button>':''}
       <button class="nav-btn" onclick="doLogout()">Выйти</button>`;
+    showPage('rpl1');
   }
 }
 
 // ====== АВТОРИЗАЦИЯ ======
 async function doLogin(){
-  const u=document.getElementById('loginUser').value.trim();
-  const p=document.getElementById('loginPass').value;
+  const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;
   const err=document.getElementById('loginErr');
   err.style.display='none';
   if(!u||!p){err.textContent='Заполните все поля';err.style.display='block';return;}
   const {data,error}=await sb.from('users').select('*').eq('username',u).eq('password',p).single();
   if(error||!data){err.textContent='Неверный логин или пароль';err.style.display='block';return;}
   currentUser=data;
-  // Сохраняем сессию в sessionStorage
-  sessionStorage.setItem('wc2026_user', JSON.stringify(data));
+  sessionStorage.setItem('wc2026_user',JSON.stringify(data));
   renderNav();
   await loadData();
-  showPage('playoff');
+  showPage('rpl1');
 }
 
 async function doRegister(){
-  const u=document.getElementById('regUser').value.trim();
-  const p=document.getElementById('regPass').value;
-  const p2=document.getElementById('regPass2').value;
+  const u=document.getElementById('regUser').value.trim(),p=document.getElementById('regPass').value,p2=document.getElementById('regPass2').value;
   const err=document.getElementById('regErr');
   err.style.display='none';
   if(!u||u.length<2){err.textContent='Логин минимум 2 символа';err.style.display='block';return;}
   if(!p||p.length<4){err.textContent='Пароль минимум 4 символа';err.style.display='block';return;}
   if(p!==p2){err.textContent='Пароли не совпадают';err.style.display='block';return;}
-  // Проверяем занят ли логин
   const {data:exists}=await sb.from('users').select('id').eq('username',u).single();
   if(exists){err.textContent='Такой логин уже занят';err.style.display='block';return;}
   const {data,error}=await sb.from('users').insert({username:u,password:p,is_admin:false}).select().single();
-  if(error){err.textContent='Ошибка регистрации: '+error.message;err.style.display='block';return;}
+  if(error){err.textContent='Ошибка: '+error.message;err.style.display='block';return;}
   currentUser=data;
-  sessionStorage.setItem('wc2026_user', JSON.stringify(data));
+  sessionStorage.setItem('wc2026_user',JSON.stringify(data));
   renderNav();
   await loadData();
-  showPage('playoff');
+  showPage('rpl1');
 }
 
 function doLogout(){
   currentUser=null;
   sessionStorage.removeItem('wc2026_user');
-  allPredictions={};
-  allResults={};
+  allPredictions={};allResults={};
   renderNav();
   showPage('login');
 }
 
-// ====== МАТЧИ ======
+// ====== СТАТУС МАТЧА ======
 function getMatchStatus(m){
   if(isFinished(m))return{label:'Завершён',cls:'status-finished'};
   if(!isOpen(m))return{label:'Закрыт',cls:'status-closed'};
   return{label:'Открыт',cls:'status-open'};
 }
 
-function buildMatchCard(m){
+// ====== РПЛ: СПИСОК МАТЧЕЙ ======
+function buildRPLCard(m){
   const f=fmtMSK(m.ts);
   const st=getMatchStatus(m);
   const preds=allPredictions[m.id]||[];
@@ -440,12 +357,12 @@ function buildMatchCard(m){
   }
   const scoreStr=result
     ?`<span class="result-score">${result.home_score}:${result.away_score}</span>`
-    :`<div class="match-time">${f.time}</div><div class="match-meta">GMT+3 · Гр.${m.g}</div>`;
+    :`<div class="match-time">${f.time}</div><div class="match-meta">GMT+3</div>`;
   return `<div class="match-card${myPred?' has-pred':''}" onclick="showPage('match','${m.id}')">
     <div class="match-top">
-      <div class="team-block"><img class="team-flag" src="https://flagcdn.com/w40/${m.hf}.png" onerror="this.style.display='none'" alt="${m.home}"><div class="team-name">${m.home}</div></div>
+      <div class="team-block">${teamBadge(m.ha,m.hc)}<div class="team-name">${m.home}</div></div>
       <div class="vs-block">${scoreStr}<span class="match-status ${st.cls}">${st.label}</span></div>
-      <div class="team-block right"><img class="team-flag" src="https://flagcdn.com/w40/${m.af}.png" onerror="this.style.display='none'" alt="${m.away}"><div class="team-name">${m.away}</div></div>
+      <div class="team-block right">${teamBadge(m.aa,m.ac)}<div class="team-name">${m.away}</div></div>
     </div>${bottom}</div>`;
 }
 
@@ -463,386 +380,56 @@ function buildDayGroups(matches){
     const[y,mo,da]=dk.split('-');
     const wd=new Date(Date.UTC(+y,+mo-1,+da)).getUTCDay();
     html+=`<div class="day-header">📅 ${+da} ${monthsRu[+mo-1]} — ${dayNamesRu[wd]}</div>`;
-    byDay[dk].forEach(m=>{ html+=buildMatchCard(m); });
+    byDay[dk].forEach(m=>{ html+=buildRPLCard(m); });
   }
   return html;
 }
 
-function renderMatches(){
-  const finished = MATCHES.filter(m=>isFinished(m));
-  const upcoming = MATCHES.filter(m=>!isFinished(m));
-
+function renderRPL(){
+  const finished=RPL_MATCHES.filter(m=>isFinished(m));
+  const upcoming=RPL_MATCHES.filter(m=>!isFinished(m));
   let html='';
-
-  // Секция завершённых матчей (свёрнута по умолчанию)
   if(finished.length>0){
     html+=`<div class="finished-section">
       <div class="finished-header" onclick="toggleFinished()">
         <span>✅ Завершённые матчи (${finished.length})</span>
         <span id="finishedArrow" style="transition:transform 0.2s;">▼</span>
       </div>
-      <div id="finishedList" style="display:none;">
-        ${buildDayGroups(finished)}
-      </div>
+      <div id="finishedList" style="display:none;">${buildDayGroups(finished)}</div>
     </div>`;
   }
-
-  // Предстоящие матчи
-  html += buildDayGroups(upcoming);
-
-  document.getElementById('matchList').innerHTML=html;
+  html+=buildDayGroups(upcoming);
+  document.getElementById('rpl1List').innerHTML=html||'<div style="color:#6B8AA8;padding:20px;text-align:center;">Матчи скоро начнутся</div>';
 }
 
 function toggleFinished(){
   const list=document.getElementById('finishedList');
   const arrow=document.getElementById('finishedArrow');
-  if(list.style.display==='none'){
-    list.style.display='block';
-    arrow.style.transform='rotate(180deg)';
-  } else {
-    list.style.display='none';
-    arrow.style.transform='rotate(0deg)';
-  }
+  if(list.style.display==='none'){list.style.display='block';arrow.style.transform='rotate(180deg)';}
+  else{list.style.display='none';arrow.style.transform='rotate(0deg)';}
 }
 
 // ====== СТРАНИЦА МАТЧА ======
 function renderMatchDetail(){
-  const m=MATCHES.find(x=>x.id===currentMatchId); if(!m)return;
+  const m=RPL_MATCHES.find(x=>x.id===currentMatchId);if(!m)return;
   const f=fmtMSK(m.ts);
   const st=getMatchStatus(m);
   const preds=allPredictions[m.id]||[];
   const myPred=currentUser?preds.find(p=>p.username===currentUser.username):null;
   const result=allResults[m.id];
   const open=isOpen(m),finished=isFinished(m);
-  let predSection='';
-  if(open&&currentUser){
-    const h=myPred?myPred.home_score:'', a=myPred?myPred.away_score:'';
-    predSection=`<div class="predict-box"><div class="predict-title">Ваш прогноз</div>
-      <div class="score-input-row">
-        <div class="team-label">${m.hf}<br>${m.home}</div>
-        <input class="score-num" type="number" min="0" max="20" id="ph" value="${h}" placeholder="0">
-        <span class="score-dash">—</span>
-        <input class="score-num" type="number" min="0" max="20" id="pa" value="${a}" placeholder="0">
-        <div class="team-label">${m.af}<br>${m.away}</div>
-      </div>
-      <button class="btn-login" onclick="savePred('${m.id}')">СОХРАНИТЬ ПРОГНОЗ</button>
-      ${myPred?`<div style="text-align:center;margin-top:10px;font-size:12px;color:#6B8AA8;">Текущий: <span style="color:#F4A90A;font-weight:600">${myPred.home_score}–${myPred.away_score}</span></div>`:''}
-    </div>`;
-  } else if(!open&&!finished){
-    predSection=`<div class="predict-box"><div class="closed-msg">⏰ Приём прогнозов закрыт (менее 1 часа до матча)</div>
-      ${myPred?`<div style="text-align:center;color:#9BB3CC;font-size:13px;">Ваш прогноз: <span style="color:#F4A90A;font-weight:600">${myPred.home_score}–${myPred.away_score}</span></div>`:'<div style="text-align:center;color:#6B8AA8;font-size:13px;">Вы не сделали прогноз</div>'}
-    </div>`;
-  } else if(finished){
-    const myPts=myPred?calcPoints(myPred.home_score,myPred.away_score,result.home_score,result.away_score):null;
-    predSection=`<div class="predict-box">
-      <div style="text-align:center;margin-bottom:14px;">
-        <div style="font-size:11px;color:#6B8AA8;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Итоговый счёт</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:44px;color:#27b44b;letter-spacing:4px;">${result.home_score} : ${result.away_score}</div>
-      </div>
-      ${myPred?`<div style="text-align:center;padding:10px;background:#0D1B2A;border-radius:8px;">
-        <span style="font-size:13px;color:#9BB3CC;">Ваш прогноз: <strong style="color:#F4A90A;">${myPred.home_score}–${myPred.away_score}</strong></span>
-        <span style="margin-left:12px;font-size:13px;color:${myPts>0?'#27b44b':'#6B8AA8'};">
-          ${myPts===4?'🎯 Точный счёт':myPts===2?'✅ Разница голов':myPts===1?'👍 Верный исход':'❌ Мимо'}
-          <strong style="color:#F4A90A;"> +${myPts}</strong>
-        </span>
-      </div>`:'<div style="text-align:center;color:#6B8AA8;font-size:13px;">Прогноз не был сделан</div>'}
-    </div>`;
-  }
-  let predsHTML='';
-  if(!open||finished){
-    const rows=preds.map(p=>{
-      const pts=result?calcPoints(p.home_score,p.away_score,result.home_score,result.away_score):null;
-      return `<div class="pred-row"><span class="pred-user">👤 ${p.username}</span><span style="font-weight:500;">${p.home_score} — ${p.away_score}</span>${pts!==null?`<span class="pred-pts-badge">+${pts}</span>`:''}</div>`;
-    }).join('');
-    if(rows) predsHTML=`<div class="all-preds"><div class="preds-title">Прогнозы всех участников</div>${rows}</div>`;
-  }
-  document.getElementById('matchDetail').innerHTML=`
-    <div class="match-hero">
-      <div class="hero-teams">
-        <div class="hero-team"><img class="hero-flag" src="https://flagcdn.com/w80/${m.hf}.png" onerror="this.style.display='none'" alt="${m.home}"><div class="hero-name">${m.home}</div></div>
-        ${finished?`<div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#27b44b;letter-spacing:4px;">${result.home_score} : ${result.away_score}</div>`:`<div class="hero-vs">VS</div>`}
-        <div class="hero-team"><img class="hero-flag" src="https://flagcdn.com/w80/${m.af}.png" onerror="this.style.display='none'" alt="${m.away}"><div class="hero-name">${m.away}</div></div>
-      </div>
-      <div style="font-size:12px;color:#6B8AA8;margin-top:4px;">📅 ${f.date} · ⏰ ${f.time} GMT+3 · Группа ${m.g} · <span class="match-status ${st.cls}">${st.label}</span></div>
-    </div>
-    ${predSection}${predsHTML}`;
-}
-
-async function savePred(mid){
-  const h=document.getElementById('ph').value, a=document.getElementById('pa').value;
-  if(h===''||a===''){showToast('Введите счёт',true);return;}
-  const {error}=await sb.from('predictions').upsert({
-    user_id:currentUser.id, match_id:mid,
-    home_score:+h, away_score:+a
-  },{onConflict:'user_id,match_id'});
-  if(error){showToast('Ошибка: '+error.message,true);return;}
-  showToast('Прогноз сохранён ✓');
-  await loadData();
-  renderMatchDetail();
-  renderMatches();
-}
-
-// ====== ТАБЛИЦА ======
-function renderLeaderboard(){
-  const pts={}, counts={}, games={};
-  const finishedMatchIds=Object.keys(allResults);
-
-  // Инициализируем всех участников с прогнозами на завершённые матчи
-  finishedMatchIds.forEach(mid=>{
-    (allPredictions[mid]||[]).forEach(p=>{
-      if(!pts[p.username]){pts[p.username]=0;counts[p.username]={exact:0,diff:0,res:0};games[p.username]=0;}
-    });
-  });
-
-  // Считаем очки
-  finishedMatchIds.forEach(mid=>{
-    const r=allResults[mid];
-    (allPredictions[mid]||[]).forEach(p=>{
-      const pt=calcPoints(p.home_score,p.away_score,r.home_score,r.away_score);
-      pts[p.username]+=pt;
-      if(pt===4)counts[p.username].exact++;
-      else if(pt===2)counts[p.username].diff++;
-      else if(pt===1)counts[p.username].res++;
-    });
-  });
-
-  // Считаем кол-во матчей отдельно:
-  // для каждого пользователя — сколько завершённых матчей имеют его прогноз
-  Object.keys(pts).forEach(username=>{
-    games[username] = finishedMatchIds.filter(mid=>
-      (allPredictions[mid]||[]).some(p=>p.username===username)
-    ).length;
-  });
-
-  const lb=Object.keys(pts).map(u=>({user:u,pts:pts[u],counts:counts[u],games:games[u]}))
-    .sort((a,b)=>b.pts-a.pts||b.counts.exact-a.counts.exact);
-  const el=document.getElementById('lbContent');
-  if(!lb.length){
-    el.innerHTML=`<div class="lb-empty"><div style="font-size:32px;margin-bottom:10px;">📋</div><div>Таблица пустая — очки появятся после завершённых матчей</div></div>
-    <div class="lb-legend"><strong style="color:#E8EDF2;">Система начисления очков:</strong><br>
-    🎯 Точный счёт — <span style="color:#F4A90A;">+4 очка</span><br>
-    ✅ Разница голов — <span style="color:#F4A90A;">+2 очка</span><br>
-    👍 Исход (победа / ничья) — <span style="color:#F4A90A;">+1 очко</span></div>`;
-    return;
-  }
-  const medals=['🥇','🥈','🥉'];
-  const rows=lb.map((e,i)=>`<tr>
-    <td><span class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</span></td>
-    <td><div class="lb-name">${medals[i]||''}${e.user}</div>
-    <div class="lb-sub">🎯 ${e.counts.exact} &nbsp;✅ ${e.counts.diff} &nbsp;👍 ${e.counts.res} &nbsp;· матчей: ${e.games}</div></td>
-    <td class="lb-pts-cell"><div class="lb-pts">${e.pts}</div><span class="lb-pts-label">очков</span></td>
-  </tr>`).join('');
-  el.innerHTML=`<table class="lb-table">
-    <thead><tr><th style="width:36px;">#</th><th>Участник</th><th class="right">Очки</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table>
-  <div class="lb-legend">🎯 точный счёт (+4) &nbsp;&nbsp; ✅ разница голов (+2) &nbsp;&nbsp; 👍 исход матча (+1)</div>`;
-}
-
-// ====== АДМИН ======
-function renderAdmin(){
-  if(!currentUser||!currentUser.is_admin){
-    document.getElementById('adminList').innerHTML='<div style="color:#f07070;padding:20px;">Нет доступа</div>';
-    return;
-  }
-  document.getElementById('adminList').innerHTML=MATCHES.map(m=>{
-    const f=fmtMSK(m.ts); const r=allResults[m.id];
-    return `<div class="admin-match">
-      <div class="admin-match-name">${m.hf} ${m.home} — ${m.away} ${m.af}
-        <span style="font-size:11px;color:#6B8AA8;margin-left:6px;">${f.date} ${f.time} GMT+3 · Гр.${m.g}</span>
-      </div>
-      <div class="admin-row">
-        <input class="admin-score-in" type="number" min="0" max="20" id="rh_${m.id}" value="${r?r.home_score:''}" placeholder="Д">
-        <span style="color:#6B8AA8;font-size:18px;font-weight:bold;">:</span>
-        <input class="admin-score-in" type="number" min="0" max="20" id="ra_${m.id}" value="${r?r.away_score:''}" placeholder="Г">
-        <button class="btn-small" onclick="saveResult('${m.id}')">Сохранить</button>
-        ${r?`<button class="btn-small danger" onclick="delResult('${m.id}')">Удалить</button><span style="font-size:12px;color:#27b44b;margin-left:4px;">✓ ${r.home_score}:${r.away_score}</span>`:''}
-      </div></div>`;
-  }).join('');
-}
-
-async function saveResult(mid){
-  const h=document.getElementById('rh_'+mid).value, a=document.getElementById('ra_'+mid).value;
-  if(h===''||a==='') return;
-  const {error}=await sb.from('results').upsert({match_id:mid,home_score:+h,away_score:+a},{onConflict:'match_id'});
-  if(error){showToast('Ошибка: '+error.message,true);return;}
-  showToast('Результат сохранён ✓');
-  await loadData();
-  renderAdmin();
-}
-
-async function delResult(mid){
-  const {error}=await sb.from('results').delete().eq('match_id',mid);
-  if(error){showToast('Ошибка: '+error.message,true);return;}
-  showToast('Результат удалён');
-  await loadData();
-  renderAdmin();
-}
-
-// ====== СТАРТ ======
-(async function init(){
-  // Восстанавливаем сессию
-  const saved = sessionStorage.getItem('wc2026_user');
-  if(saved){
-    currentUser = JSON.parse(saved);
-    renderNav();
-    await loadData();
-    showPage('playoff');
-  }
-})();
-
-// ====== PLAY-OFF МАТЧИ ======
-// ET (UTC-4) → GMT+3: +7h
-function pmsk(y,mo,d,h,m){return Date.UTC(y,mo-1,d,h-3,m||0)}
-
-const PLAYOFF_MATCHES=[
-  // ===== 1/16 финала =====
-  {id:'po_m73',round:'1/16 финала',home:'ЮАР',away:'Канада',hf:'za',af:'ca',ts:pmsk(2026,6,28,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'po_m76',round:'1/16 финала',home:'Бразилия',away:'Япония',hf:'br',af:'jp',ts:pmsk(2026,6,29,20,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'po_m74',round:'1/16 финала',home:'Германия',away:'Парагвай',hf:'de',af:'py',ts:pmsk(2026,6,29,23,30),venue:'Gillette Stadium, Бостон'},
-  {id:'po_m75',round:'1/16 финала',home:'Нидерланды',away:'Марокко',hf:'nl',af:'ma',ts:pmsk(2026,6,30,4,0),venue:'Estadio BBVA, Монтеррей'},
-  {id:'po_m78',round:'1/16 финала',home:'Кот-д\'Ивуар',away:'Норвегия',hf:'ci',af:'no',ts:pmsk(2026,6,30,20,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'po_m77',round:'1/16 финала',home:'Франция',away:'Швеция',hf:'fr',af:'se',ts:pmsk(2026,7,1,0,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'po_m79',round:'1/16 финала',home:'Мексика',away:'Эквадор',hf:'mx',af:'ec',ts:pmsk(2026,7,1,4,0),venue:'Estadio Azteca, Мехико'},
-  {id:'po_m80',round:'1/16 финала',home:'Англия',away:'ДР Конго',hf:'gb-eng',af:'cd',ts:pmsk(2026,7,1,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'po_m82',round:'1/16 финала',home:'Бельгия',away:'Сенегал',hf:'be',af:'sn',ts:pmsk(2026,7,1,23,0),venue:'Lumen Field, Сиэтл'},
-  {id:'po_m81',round:'1/16 финала',home:'США',away:'Босния',hf:'us',af:'ba',ts:pmsk(2026,7,2,3,0),venue:"Levi's Stadium, Санта-Клара"},
-  {id:'po_m84',round:'1/16 финала',home:'Испания',away:'Австрия',hf:'es',af:'at',ts:pmsk(2026,7,2,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'po_m83',round:'1/16 финала',home:'Португалия',away:'Хорватия',hf:'pt',af:'hr',ts:pmsk(2026,7,3,2,0),venue:'BMO Field, Торонто'},
-  {id:'po_m85',round:'1/16 финала',home:'Швейцария',away:'Алжир',hf:'ch',af:'dz',ts:pmsk(2026,7,3,6,0),venue:'BC Place, Ванкувер'},
-  {id:'po_m88',round:'1/16 финала',home:'Австралия',away:'Египет',hf:'au',af:'eg',ts:pmsk(2026,7,3,21,0),venue:'AT&T Stadium, Даллас'},
-  {id:'po_m86',round:'1/16 финала',home:'Аргентина',away:'Кабо-Верде',hf:'ar',af:'cv',ts:pmsk(2026,7,4,1,0),venue:'Hard Rock Stadium, Майами'},
-  {id:'po_m87',round:'1/16 финала',home:'Колумбия',away:'Гана',hf:'co',af:'gh',ts:pmsk(2026,7,4,4,30),venue:'Arrowhead Stadium, Канзас-Сити'},
-  // ===== 1/8 финала =====
-  {id:'po_m90',round:'1/8 финала',home:'Канада',away:'Марокко',hf:'ca',af:'ma',ts:pmsk(2026,7,4,20,0),venue:'NRG Stadium, Хьюстон'},
-  {id:'po_m89',round:'1/8 финала',home:'Франция',away:'Парагвай',hf:'fr',af:'py',ts:pmsk(2026,7,5,0,0),venue:'Lincoln Financial Field, Филадельфия'},
-  {id:'po_m91',round:'1/8 финала',home:'Бразилия',away:'Норвегия',hf:'br',af:'no',ts:pmsk(2026,7,5,23,0),venue:'MetLife Stadium, Нью-Джерси'},
-  {id:'po_m92',round:'1/8 финала',home:'Мексика',away:'Англия',hf:'mx',af:'gb-eng',ts:pmsk(2026,7,6,3,0),venue:'Estadio Azteca, Мехико'},
-  {id:'po_m93',round:'1/8 финала',home:'Испания',away:'Португалия',hf:'es',af:'pt',ts:pmsk(2026,7,6,22,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'po_m94',round:'1/8 финала',home:'Бельгия',away:'США',hf:'be',af:'us',ts:pmsk(2026,7,7,3,0),venue:'Lumen Field, Сиэтл'},
-  {id:'po_m95',round:'1/8 финала',home:'Аргентина',away:'Египет',hf:'ar',af:'eg',ts:pmsk(2026,7,7,19,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  {id:'po_m96',round:'1/8 финала',home:'Швейцария',away:'Колумбия',hf:'ch',af:'co',ts:pmsk(2026,7,7,23,0),venue:'BC Place, Ванкувер'},
-  // ===== Четвертьфиналы =====
-  {id:'po_qf1',round:'Четвертьфинал',home:'Франция',away:'Марокко',hf:'fr',af:'ma',ts:pmsk(2026,7,9,23,0),venue:'Gillette Stadium, Бостон'},
-  {id:'po_qf2',round:'Четвертьфинал',home:'Испания',away:'Бельгия',hf:'es',af:'be',ts:pmsk(2026,7,10,22,0),venue:'SoFi Stadium, Лос-Анджелес'},
-  {id:'po_qf3',round:'Четвертьфинал',home:'Норвегия',away:'Англия',hf:'no',af:'gb-eng',ts:pmsk(2026,7,12,0,0),venue:'Hard Rock Stadium, Майами'},
-  {id:'po_qf4',round:'Четвертьфинал',home:'Аргентина',away:'Швейцария',hf:'ar',af:'ch',ts:pmsk(2026,7,12,4,0),venue:'Arrowhead Stadium, Канзас-Сити'},
-  // ===== Полуфиналы =====
-  {id:'po_sf1',round:'Полуфинал',home:'Франция',away:'Испания',hf:'fr',af:'es',ts:pmsk(2026,7,14,22,0),venue:'AT&T Stadium, Арлингтон'},
-  {id:'po_sf2',round:'Полуфинал',home:'Англия',away:'Аргентина',hf:'gb-eng',af:'ar',ts:pmsk(2026,7,15,22,0),venue:'Mercedes-Benz Stadium, Атланта'},
-  // ===== Матч за 3-е место =====
-  {id:'po_3p',round:'Матч за 3-е место',home:'Франция',away:'Англия',hf:'fr',af:'gb-eng',ts:pmsk(2026,7,19,0,0),venue:'Hard Rock Stadium, Майами'},
-  // ===== Финал =====
-  {id:'po_final',round:'Финал',home:'Испания',away:'Аргентина',hf:'es',af:'ar',ts:pmsk(2026,7,19,22,0),venue:'MetLife Stadium, Нью-Джерси'},
-].sort((a,b)=>a.ts-b.ts);
-
-// ====== PLAY-OFF: построение карточки матча ======
-function buildPlayoffMatchCard(m){
-  const f=fmtMSK(m.ts);
-  const st=getMatchStatus(m);
-  const preds=allPredictions[m.id]||[];
-  const myPred=currentUser?preds.find(p=>p.username===currentUser.username):null;
-  const result=allResults[m.id];
-  const homeFlagHtml = m.hf==='tbd'
-    ? `<div style="width:36px;height:24px;background:#1E3A5C;border-radius:3px;margin-bottom:2px;"></div>`
-    : `<img class="team-flag" src="https://flagcdn.com/w40/${m.hf}.png" onerror="this.style.display='none'" alt="${m.home}">`;
-  const awayFlagHtml = m.af==='tbd'
-    ? `<div style="width:36px;height:24px;background:#1E3A5C;border-radius:3px;margin-bottom:2px;margin-left:auto;"></div>`
-    : `<img class="team-flag" src="https://flagcdn.com/w40/${m.af}.png" onerror="this.style.display='none'" alt="${m.away}">`;
-  let bottom='';
-  if(!isOpen(m)||isFinished(m)){
-    const tags=preds.map(p=>{
-      const pts=result?calcPoints(p.home_score,p.away_score,result.home_score,result.away_score):null;
-      return `<span class="pred-tag">${p.username}: ${p.home_score}-${p.away_score}${pts!==null?` <span class="pts">(+${pts})</span>`:''}</span>`;
-    }).join('');
-    if(tags) bottom=`<div class="match-bottom"><div class="preds-list">${tags}</div></div>`;
-  } else if(myPred){
-    bottom=`<div class="match-bottom">Мой прогноз: <span class="my-pred">${myPred.home_score}-${myPred.away_score}</span></div>`;
-  }
-  const scoreStr=result
-    ?`<span class="result-score">${result.home_score}:${result.away_score}</span>`
-    :`<div class="match-time">${f.time}</div><div class="match-meta">GMT+3 · ${m.round}</div>`;
-  return `<div class="match-card${myPred?' has-pred':''}" onclick="showPage('playoffmatch','${m.id}')">
-    <div class="match-top">
-      <div class="team-block">${homeFlagHtml}<div class="team-name">${m.home}</div></div>
-      <div class="vs-block">${scoreStr}<span class="match-status ${st.cls}">${st.label}</span></div>
-      <div class="team-block right">${awayFlagHtml}<div class="team-name">${m.away}</div></div>
-    </div>${bottom}</div>`;
-}
-
-// ====== PLAY-OFF: рендер списка матчей ======
-function buildPlayoffDayGroups(matches){
-  const byDay={};
-  matches.forEach(m=>{
-    const f=fmtMSK(m.ts);
-    if(!byDay[f.key])byDay[f.key]=[];
-    byDay[f.key].push(m);
-  });
-  const dayNamesRu=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
-  const monthsRu=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-  let html='';
-  for(const dk of Object.keys(byDay).sort()){
-    const[y,mo,da]=dk.split('-');
-    const wd=new Date(Date.UTC(+y,+mo-1,+da)).getUTCDay();
-    html+=`<div class="day-header">📅 ${+da} ${monthsRu[+mo-1]} — ${dayNamesRu[wd]}</div>`;
-    byDay[dk].forEach(m=>{ html+=buildPlayoffMatchCard(m); });
-  }
-  return html;
-}
-
-function renderPlayoffMatches(){
-  const finished = PLAYOFF_MATCHES.filter(m=>isFinished(m));
-  const upcoming = PLAYOFF_MATCHES.filter(m=>!isFinished(m));
-  let html='';
-  if(finished.length>0){
-    html+=`<div class="finished-section">
-      <div class="finished-header" onclick="togglePlayoffFinished()">
-        <span>✅ Завершённые матчи (${finished.length})</span>
-        <span id="playoffFinishedArrow" style="transition:transform 0.2s;">▼</span>
-      </div>
-      <div id="playoffFinishedList" style="display:none;">${buildPlayoffDayGroups(finished)}</div>
-    </div>`;
-  }
-  html += buildPlayoffDayGroups(upcoming);
-  document.getElementById('playoffMatchList').innerHTML = html || '<div style="color:#6B8AA8;padding:20px;text-align:center;">Матчи play-off начнутся 28 июня 2026</div>';
-}
-
-function goBackFromMatch(){
-  showPage(matchContext);
-}
-
-function togglePlayoffFinished(){
-  const list=document.getElementById('playoffFinishedList');
-  const arrow=document.getElementById('playoffFinishedArrow');
-  if(list.style.display==='none'){ list.style.display='block'; arrow.style.transform='rotate(180deg)'; }
-  else { list.style.display='none'; arrow.style.transform='rotate(0deg)'; }
-}
-
-// ====== PLAY-OFF: страница матча ======
-let currentPlayoffMatchId = null;
-let matchContext = 'matches'; // tracks where user came from
-function renderPlayoffMatchDetail(){
-  const m=PLAYOFF_MATCHES.find(x=>x.id===currentPlayoffMatchId); if(!m)return;
-  const f=fmtMSK(m.ts);
-  const st=getMatchStatus(m);
-  const preds=allPredictions[m.id]||[];
-  const myPred=currentUser?preds.find(p=>p.username===currentUser.username):null;
-  const result=allResults[m.id];
-  const open=isOpen(m),finished=isFinished(m);
-  const homeFlagHtml = m.hf==='tbd' ? '' : `<img class="hero-flag" src="https://flagcdn.com/w80/${m.hf}.png" onerror="this.style.display='none'" alt="${m.home}">`;
-  const awayFlagHtml = m.af==='tbd' ? '' : `<img class="hero-flag" src="https://flagcdn.com/w80/${m.af}.png" onerror="this.style.display='none'" alt="${m.away}">`;
   let predSection='';
   if(open&&currentUser){
     const h=myPred?myPred.home_score:'',a=myPred?myPred.away_score:'';
     predSection=`<div class="predict-box"><div class="predict-title">Ваш прогноз</div>
       <div class="score-input-row">
-        <div class="team-label">${homeFlagHtml}<br>${m.home}</div>
-        <input class="score-num" type="number" min="0" max="20" id="poph" value="${h}" placeholder="0">
+        <div class="team-label" style="display:flex;flex-direction:column;align-items:center;">${teamBadge(m.ha,m.hc)}<span style="margin-top:4px;">${m.home}</span></div>
+        <input class="score-num" type="number" min="0" max="20" id="ph" value="${h}" placeholder="0">
         <span class="score-dash">—</span>
-        <input class="score-num" type="number" min="0" max="20" id="popa" value="${a}" placeholder="0">
-        <div class="team-label">${awayFlagHtml}<br>${m.away}</div>
+        <input class="score-num" type="number" min="0" max="20" id="pa" value="${a}" placeholder="0">
+        <div class="team-label" style="display:flex;flex-direction:column;align-items:center;">${teamBadge(m.aa,m.ac)}<span style="margin-top:4px;">${m.away}</span></div>
       </div>
-      <button class="btn-login" onclick="savePlayoffPred('${m.id}')">СОХРАНИТЬ ПРОГНОЗ</button>
+      <button class="btn-login" onclick="savePred('${m.id}')">СОХРАНИТЬ ПРОГНОЗ</button>
       ${myPred?`<div style="text-align:center;margin-top:10px;font-size:12px;color:#6B8AA8;">Текущий: <span style="color:#F4A90A;font-weight:600">${myPred.home_score}–${myPred.away_score}</span></div>`:''}
     </div>`;
   } else if(!open&&!finished){
@@ -872,37 +459,45 @@ function renderPlayoffMatchDetail(){
   document.getElementById('matchDetail').innerHTML=`
     <div class="match-hero">
       <div class="hero-teams">
-        <div class="hero-team">${homeFlagHtml}<div class="hero-name">${m.home}</div></div>
+        <div class="hero-team">
+          <div style="display:flex;justify-content:center;margin-bottom:6px;">${teamBadge(m.ha,m.hc).replace('width:38px;height:38px','width:56px;height:56px;font-size:12px')}</div>
+          <div class="hero-name">${m.home}</div>
+        </div>
         ${finished?`<div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#27b44b;letter-spacing:4px;">${result.home_score} : ${result.away_score}</div>`:`<div class="hero-vs">VS</div>`}
-        <div class="hero-team">${awayFlagHtml}<div class="hero-name">${m.away}</div></div>
+        <div class="hero-team">
+          <div style="display:flex;justify-content:center;margin-bottom:6px;">${teamBadge(m.aa,m.ac).replace('width:38px;height:38px','width:56px;height:56px;font-size:12px')}</div>
+          <div class="hero-name">${m.away}</div>
+        </div>
       </div>
-      <div style="font-size:12px;color:#6B8AA8;margin-top:4px;">🏆 ${m.round} · 📅 ${f.date} · ⏰ ${f.time} GMT+3 · <span class="match-status ${st.cls}">${st.label}</span></div>
+      <div style="font-size:12px;color:#6B8AA8;margin-top:4px;">📅 ${f.date} · ⏰ ${f.time} GMT+3 · 📍 ${m.venue} · <span class="match-status ${st.cls}">${st.label}</span></div>
     </div>
     ${predSection}${predsHTML}`;
 }
 
-async function savePlayoffPred(mid){
-  const h=document.getElementById('poph').value, a=document.getElementById('popa').value;
+async function savePred(mid){
+  const h=document.getElementById('ph').value,a=document.getElementById('pa').value;
   if(h===''||a===''){showToast('Введите счёт',true);return;}
   const {error}=await sb.from('predictions').upsert({user_id:currentUser.id,match_id:mid,home_score:+h,away_score:+a},{onConflict:'user_id,match_id'});
   if(error){showToast('Ошибка: '+error.message,true);return;}
   showToast('Прогноз сохранён ✓');
   await loadData();
-  renderPlayoffMatchDetail();
-  renderPlayoffMatches();
+  renderMatchDetail();
+  renderRPL();
 }
 
-// ====== PLAY-OFF ТАБЛИЦА ======
-function renderPlayoffLeaderboard(){
-  const playoffIds = new Set(PLAYOFF_MATCHES.map(m=>m.id));
-  const pts={}, counts={}, games={};
-  const finishedPlayoffIds = Object.keys(allResults).filter(mid=>playoffIds.has(mid));
-  finishedPlayoffIds.forEach(mid=>{
+function goBackFromMatch(){showPage('rpl1');}
+
+// ====== ТАБЛИЦА ЧР ТУР 1 ======
+function renderLeaderboard(){
+  const rplIds=new Set(RPL_MATCHES.map(m=>m.id));
+  const pts={},counts={},games={};
+  const finishedIds=Object.keys(allResults).filter(mid=>rplIds.has(mid));
+  finishedIds.forEach(mid=>{
     (allPredictions[mid]||[]).forEach(p=>{
       if(!pts[p.username]){pts[p.username]=0;counts[p.username]={exact:0,diff:0,res:0};games[p.username]=0;}
     });
   });
-  finishedPlayoffIds.forEach(mid=>{
+  finishedIds.forEach(mid=>{
     const r=allResults[mid];
     (allPredictions[mid]||[]).forEach(p=>{
       const pt=calcPoints(p.home_score,p.away_score,r.home_score,r.away_score);
@@ -913,13 +508,13 @@ function renderPlayoffLeaderboard(){
     });
   });
   Object.keys(pts).forEach(u=>{
-    games[u]=finishedPlayoffIds.filter(mid=>(allPredictions[mid]||[]).some(p=>p.username===u)).length;
+    games[u]=finishedIds.filter(mid=>(allPredictions[mid]||[]).some(p=>p.username===u)).length;
   });
   const lb=Object.keys(pts).map(u=>({user:u,pts:pts[u],counts:counts[u],games:games[u]}))
     .sort((a,b)=>b.pts-a.pts||b.counts.exact-a.counts.exact);
-  const el=document.getElementById('lbPlayoffContent');
+  const el=document.getElementById('lbContent');
   if(!lb.length){
-    el.innerHTML=`<div class="lb-empty"><div style="font-size:32px;margin-bottom:10px;">📋</div><div>Таблица пустая — очки появятся после завершённых матчей play-off</div></div>
+    el.innerHTML=`<div class="lb-empty"><div style="font-size:32px;margin-bottom:10px;">📋</div><div>Таблица пустая — очки появятся после завершённых матчей</div></div>
     <div class="lb-legend"><strong style="color:#E8EDF2;">Система начисления очков:</strong><br>
     🎯 Точный счёт — <span style="color:#F4A90A;">+4 очка</span><br>
     ✅ Разница голов — <span style="color:#F4A90A;">+2 очка</span><br>
@@ -940,51 +535,13 @@ function renderPlayoffLeaderboard(){
   <div class="lb-legend">🎯 точный счёт (+4) &nbsp;&nbsp; ✅ разница голов (+2) &nbsp;&nbsp; 👍 исход матча (+1)</div>`;
 }
 
-function toggleGroupLB(){
-  const list=document.getElementById('groupLBContent');
-  const arrow=document.getElementById('groupLBArrow');
-  if(list.style.display==='none'){ list.style.display='block'; arrow.style.transform='rotate(180deg)'; }
-  else { list.style.display='none'; arrow.style.transform='rotate(0deg)'; }
-}
-
-// ====== ОБНОВЛЯЕМ renderLeaderboard чтобы также рендерить play-off ======
-const _origRenderLeaderboard = renderLeaderboard;
-renderLeaderboard = function(){
-  _origRenderLeaderboard();
-  renderPlayoffLeaderboard();
-};
-
-// ====== ОБНОВЛЯЕМ showPage для playoffmatch ======
-const _origShowPage = showPage;
-showPage = function(id, matchId){
-  if(id==='playoffmatch'){
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.getElementById('page-match').classList.add('active');
-    if(matchId) currentPlayoffMatchId=matchId;
-    matchContext='playoff';
-    renderPlayoffMatchDetail();
-    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active-tab'));
-    const el=document.getElementById('tabPlayoff'); if(el)el.classList.add('active-tab');
-    return;
-  }
-  _origShowPage(id, matchId);
-};
-
-// Добавляем play-off матчи в renderAdmin
-const _origRenderAdmin = renderAdmin;
-renderAdmin = function(){
-  _origRenderAdmin();
-  // Добавляем секцию play-off в конец admin
-  const adminList = document.getElementById('adminList');
-  const poHeader = document.createElement('div');
-  poHeader.innerHTML = '<div class="section-title" style="margin-top:20px;font-size:18px;">⚽ Play-off матчи</div>';
-  adminList.appendChild(poHeader);
-  PLAYOFF_MATCHES.forEach(m=>{
-    const f=fmtMSK(m.ts); const r=allResults[m.id];
-    const div = document.createElement('div');
-    div.className = 'admin-match';
-    div.innerHTML = `<div class="admin-match-name">${m.home} — ${m.away}
-        <span style="font-size:11px;color:#6B8AA8;margin-left:6px;">${m.round} · ${f.date} ${f.time} GMT+3</span>
+// ====== ADMIN ======
+function renderAdmin(){
+  document.getElementById('adminList').innerHTML=RPL_MATCHES.map(m=>{
+    const f=fmtMSK(m.ts);const r=allResults[m.id];
+    return `<div class="admin-match">
+      <div class="admin-match-name">${m.home} — ${m.away}
+        <span style="font-size:11px;color:#6B8AA8;margin-left:6px;">${f.date} ${f.time} GMT+3</span>
       </div>
       <div class="admin-row">
         <input class="admin-score-in" type="number" min="0" max="20" id="rh_${m.id}" value="${r?r.home_score:''}" placeholder="Д">
@@ -992,11 +549,35 @@ renderAdmin = function(){
         <input class="admin-score-in" type="number" min="0" max="20" id="ra_${m.id}" value="${r?r.away_score:''}" placeholder="Г">
         <button class="btn-small" onclick="saveResult('${m.id}')">Сохранить</button>
         ${r?`<button class="btn-small danger" onclick="delResult('${m.id}')">Удалить</button><span style="font-size:12px;color:#27b44b;margin-left:4px;">✓ ${r.home_score}:${r.away_score}</span>`:''}
-      </div>`;
-    adminList.appendChild(div);
-  });
-};
+      </div></div>`;
+  }).join('');
+}
 
+async function saveResult(mid){
+  const h=document.getElementById('rh_'+mid).value,a=document.getElementById('ra_'+mid).value;
+  if(h===''||a==='')return;
+  const {error}=await sb.from('results').upsert({match_id:mid,home_score:+h,away_score:+a},{onConflict:'match_id'});
+  if(error){showToast('Ошибка: '+error.message,true);return;}
+  showToast('Результат сохранён ✓');
+  await loadData();renderAdmin();
+}
+async function delResult(mid){
+  const {error}=await sb.from('results').delete().eq('match_id',mid);
+  if(error){showToast('Ошибка: '+error.message,true);return;}
+  showToast('Результат удалён');
+  await loadData();renderAdmin();
+}
+
+// ====== СТАРТ ======
+(async function init(){
+  const saved=sessionStorage.getItem('wc2026_user');
+  if(saved){
+    currentUser=JSON.parse(saved);
+    renderNav();
+    await loadData();
+    showPage('rpl1');
+  }
+})();
 </script>
 </body>
 </html>
