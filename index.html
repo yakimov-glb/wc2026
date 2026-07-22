@@ -239,11 +239,11 @@ function showToast(msg,isErr=false){
   setTimeout(()=>t.style.display='none',3000);
 }
 
-const TEAM_IDS={'ЦСКА':2325,'Балтика':7517,'Динамо':2315,'Крылья Советов':2322,'Акрон':285689,'Зенит':2321,'Факел':2317,'Динамо Мх':362016,'Спартак':2323,'Родина':322699,'Оренбург':24118,'Ростов':2326,'Локомотив':2320,'Ахмат':5131,'Рубин':2333,'Краснодар':34425};
+const TEAM_LOGOS={'ЦСКА':'https://r2.thesportsdb.com/images/media/team/badge/1hf19s1681319986.png','Балтика':'https://r2.thesportsdb.com/images/media/team/badge/wiocaa1683738193.png','Спартак':'https://r2.thesportsdb.com/images/media/team/badge/zpj2el1754674286.png','Родина':'https://r2.thesportsdb.com/images/media/team/badge/2491j61683738517.png','Локомотив':'https://r2.thesportsdb.com/images/media/team/badge/tuyrur1473452310.png','Ахмат':'https://r2.thesportsdb.com/images/media/team/badge/ake14u1579347653.png','Оренбург':'https://r2.thesportsdb.com/images/media/team/badge/9wa10h1754674044.png','Ростов':'https://r2.thesportsdb.com/images/media/team/badge/yysryx1473452299.png','Рубин':'https://r2.thesportsdb.com/images/media/team/badge/hp9kw81579347672.png','Краснодар':'https://r2.thesportsdb.com/images/media/team/badge/srxryu1473452272.png','Динамо':'https://r2.thesportsdb.com/images/media/team/badge/j27vke1782186818.png','Крылья Советов':'https://r2.thesportsdb.com/images/media/team/badge/09tdco1754673733.png','Факел':'https://r2.thesportsdb.com/images/media/team/badge/i93d561579627760.png','Динамо Мх':'https://r2.thesportsdb.com/images/media/team/badge/alzjuc1656588520.png','Акрон':'https://r2.thesportsdb.com/images/media/team/badge/bjwmoi1683738446.png','Зенит':'https://r2.thesportsdb.com/images/media/team/badge/t20z2n1782186629.png'};
 function teamLogo(name){
-  const id=TEAM_IDS[name];
-  if(!id) return `<div style="width:38px;height:38px;background:#1E3A5C;border-radius:50%;"></div>`;
-  return `<img class="team-logo" src="https://img.sofascore.com/api/v1/team/${id}/image" alt="${name}" onerror="this.style.display='none'">`;
+  const url=TEAM_LOGOS[name];
+  if(!url) return `<div style="width:38px;height:38px;background:#1E3A5C;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:#9BB3CC;">${name.substring(0,3)}</div>`;
+  return `<img class="team-logo" src="${url}" alt="${name}" onerror="this.style.display='none'">`;
 }
 
 // ====== ЗАГРУЗКА ======
